@@ -2,10 +2,6 @@
 title: "IS415-GAA"
 ---
 
-This is a Quarto website.
+Welcome to **SMU IS415 Geospatial Analytics and Applications.**
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
-
-```{r}
-1 + 1
-```
+This is the course website for IS415 in AY2022/2023 Semester 2 and is where you can find my course work done for this module.
