@@ -186,7 +186,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#compute-density",
     "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
     "section": "Compute density",
-    "text": "Compute density"
+    "text": "Compute density\n\nmpsz3414 <- mpsz3414 %>%\n  mutate(`PreSch Density` = `PreSch Count`/Area * 1000000)"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram",
@@ -194,5 +194,26 @@
     "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
     "section": "Histogram",
     "text": "Histogram\n\nglimpse(mpsz3414$'PreSch Density')\n\n num [1:323] NA NA NA NA NA NA NA NA NA NA ..."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-density",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#histogram-of-density",
+    "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
+    "section": "Histogram of Density",
+    "text": "Histogram of Density\n\nhist(mpsz3414$`PreSch Density`)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#are-pre-schools-even-distributed-in-singapore",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#are-pre-schools-even-distributed-in-singapore",
+    "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
+    "section": "Are pre-schools even distributed in Singapore?",
+    "text": "Are pre-schools even distributed in Singapore?\n\nggplot(data=mpsz3414, \n       aes(x= as.numeric(`PreSch Density`)))+\n  geom_histogram(bins=20, \n                 color=\"black\", \n                 fill=\"light blue\") +\n  labs(title = \"Are pre-school even distributed in Singapore?\",\n       subtitle= \"There are many planning sub-zones with a single pre-school, on the other hand, \\nthere are two planning sub-zones with at least 20 pre-schools\",\n      x = \"Pre-school density (per km sq)\",\n      y = \"Frequency\")"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#relationship-between-pre-school-density-and-pre-school-count",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#relationship-between-pre-school-density-and-pre-school-count",
+    "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
+    "section": "Relationship between Pre-School Density and Pre-school Count",
+    "text": "Relationship between Pre-School Density and Pre-school Count\n\nggplot(data=mpsz3414, \n       aes(y = `PreSch Count`, \n           x= as.numeric(`PreSch Density`)))+\n  geom_point(color=\"black\", \n             fill=\"light blue\") +\n  xlim(0, 40) +\n  ylim(0, 40) +\n  labs(title = \"\",\n      x = \"Pre-school density (per km sq)\",\n      y = \"Pre-school count\")"
   }
 ]
