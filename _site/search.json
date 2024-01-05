@@ -12,5 +12,19 @@
     "title": "IS415-GAA",
     "section": "",
     "text": "This is the course website for IS415 in AY2022/2023 Semester 2 and is where you can find my course work done for this module."
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html",
+    "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
+    "section": "",
+    "text": "In this section, I will install and load tidyverse and sf packages.\n\npacman::p_load(tidyverse, sf)"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-the-geospatial-data",
+    "href": "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html#plotting-the-geospatial-data",
+    "title": "Hands-on Exercise 01: Geospatial Data Wrangling with R",
+    "section": "Plotting the Geospatial Data",
+    "text": "Plotting the Geospatial Data\n\nplot(mpsz)"
   }
 ]
