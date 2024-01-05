@@ -189,7 +189,7 @@ summary(mpsz3414$'PreSch Count')
 
 ## Subzone with the highest number of pre-schools (ak prof about wt problem)
 ```{r}
-dplyr::top_n(mpsz3414, 1)
+top_n(mpsz3414, 1)
 
 ```
 
@@ -202,9 +202,7 @@ mpsz3414$Area <- mpsz3414 %>%
 ```
 
 ## Compute density
-```{r}
-glimpse(mpsz3414$"PreSch Count")
-```
+
 
 
 

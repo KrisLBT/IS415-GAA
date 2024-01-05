@@ -696,7 +696,7 @@ $ geometry                       &lt;POINT [m]&gt; POINT (41972.5 36390.05), POI
 <section id="subzone-with-the-highest-number-of-pre-schools-ak-prof-about-wt-problem" class="level2">
 <h2 class="anchored" data-anchor-id="subzone-with-the-highest-number-of-pre-schools-ak-prof-about-wt-problem">Subzone with the highest number of pre-schools (ak prof about wt problem)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">top_n</span>(mpsz3414, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">top_n</span>(mpsz3414, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 1 feature and 16 fields
 Geometry type: MULTIPOLYGON
@@ -724,12 +724,6 @@ Projected CRS: SVY21 / Singapore TM
 </section>
 <section id="compute-density" class="level2">
 <h2 class="anchored" data-anchor-id="compute-density">Compute density</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(mpsz3414<span class="sc">$</span><span class="st">"PreSch Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> int [1:323] 0 6 0 5 3 13 5 1 11 1 ...</code></pre>
-</div>
-</div>
 
 
 </section>
