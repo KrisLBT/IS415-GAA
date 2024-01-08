@@ -40,6 +40,7 @@ preschool=st_read("data/geospatial/PreSchoolsLocation.kml")
 ```
 
 # Working with functions
+
 ## st_geometry()
 
 ```{r}
@@ -48,19 +49,22 @@ st_geometry(mpsz)
 ```
 
 ## glimpse()
+
 ```{r}
 glimpse(mpsz)
 
 ```
 
 ## head()
+
 ```{r}
 head(mpsz, n=5)
 
 ```
 
 # Plotting the Geospatial Data
-## Basic Plotting 
+
+## Basic Plotting
 
 ```{r}
 plot(mpsz)
@@ -68,6 +72,7 @@ plot(mpsz)
 ```
 
 ## Plotting st_geometry()
+
 ```{r}
 plot(st_geometry(mpsz))
 
@@ -80,29 +85,34 @@ plot(mpsz["PLN_AREA_N"])
 
 ```
 
-
 # Projection for Geospatial
 
 ## Assigning EPSG code to a simple feature dataframe
+
 ###Seeing the CRS
+
 ```{r}
 st_crs(mpsz)
 
 ```
 
 ### Setting the CRS to 3414
+
 ```{r}
 mpsz3414 <- st_set_crs(mpsz, 3414)
 ```
 
 ## Check the CRS again
+
 ```{r}
 st_crs(mpsz3414)
 
 ```
 
 # Transforming the projection of (geospatial) preschool from wgs84 to svy21
+
 ## Check the geometry
+
 Firstly, I will check the projection for preschool
 
 ```{r}
@@ -110,6 +120,7 @@ st_geometry(preschool)
 ```
 
 ## Transform
+
 Then, I will transform the CRS
 
 ```{r}
@@ -125,9 +136,10 @@ st_geometry(preschool3414)
 
 ```
 
-
 # Importing and Converting Aspatial Data
+
 ## Reading the csv file
+
 ```{r}
 listings <- read_csv("data/aspatial/listings.csv")
 ```
@@ -139,7 +151,6 @@ list(listings)
 
 ```
 
-
 ## Convert the simple feature data frame from an aspatial data frame
 
 ```{r}
@@ -150,13 +161,15 @@ listings_sf <- st_as_sf(listings,
 ```
 
 ## Examine contents
+
 ```{r}
 glimpse(listings_sf)
 ```
 
-
 # Geoprocessing with sf package
+
 ## Buffering
+
 ### Computing the 5-metres buffers around cycling paths
 
 ```{r}
@@ -165,36 +178,44 @@ buffer_cycling <- st_buffer(cyclingpath,
 ```
 
 ### Calculating area
+
 ```{r}
 buffer_cycling$AREA <- st_area(buffer_cycling)
 
 ```
 
 ### Derive total land involved
+
 ```{r}
 sum(buffer_cycling$AREA)
       
 ```
 
 # Point in polygon Count
+
 ## Calculate number of preschools that fall insde each planning subzone
+
 ```{r}
 mpsz3414$'PreSch Count'<- lengths(st_intersects(mpsz3414, preschool3414))
 ```
 
 ## Summary of the Count
+
 ```{r}
 summary(mpsz3414$'PreSch Count')
 ```
 
 ## Subzone with the highest number of pre-schools (ak prof about wt problem)
+
 ```{r}
 top_n(mpsz3414, 1)
 
 ```
 
 # DIY Calculate Density of Pre-school by Planning Subzone
+
 ## Derive area of each planning subzone
+
 ```{r}
 mpsz3414$Area <- mpsz3414 %>%
   st_area()
@@ -209,12 +230,15 @@ mpsz3414 <- mpsz3414 %>%
 ```
 
 # EDA
+
 ## Histogram of Density
+
 ```{r}
 hist(mpsz3414$`PreSch Density`)
 ```
 
 ## Are pre-schools even distributed in Singapore?
+
 ```{r}
 ggplot(data=mpsz3414, 
        aes(x= as.numeric(`PreSch Density`)))+
@@ -226,7 +250,6 @@ ggplot(data=mpsz3414,
       x = "Pre-school density (per km sq)",
       y = "Frequency")
 ```
-
 
 ## Relationship between Pre-School Density and Pre-school Count
 
@@ -242,7 +265,3 @@ ggplot(data=mpsz3414,
       x = "Pre-school density (per km sq)",
       y = "Pre-school count")
 ```
-
-
-
-

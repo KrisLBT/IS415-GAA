@@ -1,0 +1,8 @@
+---
+title: "In-class Exercise 1"
+execute:
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+There is no submission.
