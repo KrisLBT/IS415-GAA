@@ -4,7 +4,7 @@
     "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
     "title": "In-class Exercise 2",
     "section": "",
-    "text": "In this exercise, we will be using the Grab Polisi data downloaded the previous week."
+    "text": "In this exercise, we will be using the GrabPosisi data downloaded the previous week."
   },
   {
     "objectID": "about.html",
@@ -270,6 +270,41 @@
     "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
     "title": "In-class Exercise 2",
     "section": "Package installation",
-    "text": "Package installation\nThe following packages will be used and loaded in the R environment for this exercise:\n\narrow\nlubridate\ntmap\ntidyverse\n\nCode chunk:\n\npacman::p_load(arrow, lubridate, tmap, tidyverse, sf)\n\n\n\n\n\n\n\nNote: saw callout notes on prof’s code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don’t have to constantly toggle between the two modes"
+    "text": "Package installation\nThe following packages will be used and loaded in the R environment for this exercise:\n\narrow: handles databases and data conversions. Allows us to work with Parquet files, which are rare\nlubridate: helps lubricate data file\ntmap\ntidyverse\n\nCode chunk:\n\n\nShow the code\npacman::p_load(arrow, lubridate, tmap, tidyverse, sf)\n\n\n\n\n\n\n\n\nNote: saw callout notes on prof’s code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don’t have to constantly toggle between the two modes"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#importing-the-grab-posisi-dataset",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#importing-the-grab-posisi-dataset",
+    "title": "In-class Exercise 2",
+    "section": "Importing the Grab-Posisi Dataset",
+    "text": "Importing the Grab-Posisi Dataset\n\n\n\n\n\n\nDanger\n\n\n\nWarning: Data is very, very large and will cause RStudio to crash if you upload it to Github. Remember to ensure .gitignore will ignore data/ subdirectories!"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading-the-grabposisi-data",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading-the-grabposisi-data",
+    "title": "In-class Exercise 2",
+    "section": "Reading the GrabPosisi data",
+    "text": "Reading the GrabPosisi data\n\n\nShow the code\ndf <- read_parquet(file=\"../../data/data/GrabPosisi/part-00000-8bbff892-97d2-4011-9961-703e38972569.c000.snappy.parquet\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#converting-the-pingtimestamp-to-date_time",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#converting-the-pingtimestamp-to-date_time",
+    "title": "In-class Exercise 2",
+    "section": "Converting the pingtimestamp to date_time",
+    "text": "Converting the pingtimestamp to date_time\nThere was supposed to be a datetime stamp but it wasn’t in that format. As such, the data type needs to be changed\n\n\nShow the code\ndf$pingtimestamp <- as_datetime(df$pingtimestamp)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#writing",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#writing",
+    "title": "In-class Exercise 2",
+    "section": "Writing",
+    "text": "Writing\nNow, we will write it to a separate rds file:\n\n\nShow the code\nwrite_rds(origin_df, \"data/rds/origin_df.rds\")\nwrite_rds(destination_df, \"data/rds/destination_df.rds\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading",
+    "title": "In-class Exercise 2",
+    "section": "Reading",
+    "text": "Reading\n\n\nShow the code\norigin_df <- read_rds(\"data/rds/origin_df.rds\")\ndestination_df <- read_rds(\"data/rds/destination_df.rds\")"
   }
 ]

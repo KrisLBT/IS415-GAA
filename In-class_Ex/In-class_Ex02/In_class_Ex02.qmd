@@ -1,13 +1,21 @@
 ---
 title: "In-class Exercise 2"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
 execute:
+  eval: True
+  echo: True
   warning: False
 date: "`r Sys.Date()`"
 ---
 
 # Overview
 
-In this exercise, we will be using the Grab Polisi data downloaded the previous week.
+In this exercise, we will be using the GrabPosisi data downloaded the previous week.
 
 # Getting started
 
@@ -19,12 +27,9 @@ Using the file navigation in RStudio, create a new subdirectory for the second i
 
 The following packages will be used and loaded in the R environment for this exercise:
 
--   arrow
-
--   lubridate
-
+-   **arrow:** handles databases and data conversions. Allows us to work with Parquet files, which are rare
+-   **lubridate:** helps lubricate data file
 -   tmap
-
 -   tidyverse
 
 Code chunk:
@@ -37,4 +42,89 @@ pacman::p_load(arrow, lubridate, tmap, tidyverse, sf)
 Note: saw callout notes on prof's code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don't have to constantly toggle between the two modes
 :::
 
+## Importing the Grab-Posisi Dataset
 
+::: callout-caution
+**Warning:** Data is very, very large and will cause RStudio to crash if you upload it to Github. Remember to ensure .gitignore will ignore data/ subdirectories!
+:::
+
+# Handling the data
+
+## Reading the GrabPosisi data
+
+```{r}
+#| eval: FALSE
+
+df <- read_parquet(file="../../data/data/GrabPosisi/part-00000-8bbff892-97d2-4011-9961-703e38972569.c000.snappy.parquet")
+```
+
+## Converting the pingtimestamp to date_time
+
+There was supposed to be a datetime stamp but it wasn't in that format. As such, the data type needs to be changed
+
+```{r}
+#| eval: FALSE
+df$pingtimestamp <- as_datetime(df$pingtimestamp)
+```
+
+# Extracting trip starting locations
+
+```{r}
+#| eval: FALSE
+origin_df <- df %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+```
+
+How this code works: - group by the trip (treat trj_id as trip_id) - arrange it according to the timestamp - get the first row - get dates via wday, factor and mday
+
+# Extract the destinations
+
+```{r}
+#| eval: FALSE
+destination_df <- df %>%
+  group_by(trj_id) %>%
+  arrange(desc(pingtimestamp)) %>%
+  filter(row_number()== 1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         end_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+```
+
+# RDS
+
+## Writing
+
+Now, we will write it to a separate rds file:
+
+```{r}
+#| eval: FALSE
+write_rds(origin_df, "data/rds/origin_df.rds")
+write_rds(destination_df, "data/rds/destination_df.rds")
+
+```
+
+## Reading
+
+```{r}
+origin_df <- read_rds("data/rds/origin_df.rds")
+destination_df <- read_rds("data/rds/destination_df.rds")
+
+```
+
+# Visualising as point Symbol Map (TBD)
+
+# Importing Master Plan 2019 Planning Subzone Boundary (TBD)
+
+# DIY (TBD)
+
+# DIY 2 (TBD)

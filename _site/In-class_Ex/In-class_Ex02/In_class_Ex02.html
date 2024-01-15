@@ -194,10 +194,27 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <ul>
   <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
   <li><a href="#getting-started" id="toc-getting-started" class="nav-link" data-scroll-target="#getting-started">Getting started</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#folder-creation" id="toc-folder-creation" class="nav-link" data-scroll-target="#folder-creation">Folder creation</a></li>
   <li><a href="#package-installation" id="toc-package-installation" class="nav-link" data-scroll-target="#package-installation">Package installation</a></li>
+  <li><a href="#importing-the-grab-posisi-dataset" id="toc-importing-the-grab-posisi-dataset" class="nav-link" data-scroll-target="#importing-the-grab-posisi-dataset">Importing the Grab-Posisi Dataset</a></li>
   </ul></li>
+  <li><a href="#handling-the-data" id="toc-handling-the-data" class="nav-link" data-scroll-target="#handling-the-data">Handling the data</a>
+  <ul>
+  <li><a href="#reading-the-grabposisi-data" id="toc-reading-the-grabposisi-data" class="nav-link" data-scroll-target="#reading-the-grabposisi-data">Reading the GrabPosisi data</a></li>
+  <li><a href="#converting-the-pingtimestamp-to-date_time" id="toc-converting-the-pingtimestamp-to-date_time" class="nav-link" data-scroll-target="#converting-the-pingtimestamp-to-date_time">Converting the pingtimestamp to date_time</a></li>
+  </ul></li>
+  <li><a href="#extracting-trip-starting-locations" id="toc-extracting-trip-starting-locations" class="nav-link" data-scroll-target="#extracting-trip-starting-locations">Extracting trip starting locations</a></li>
+  <li><a href="#extract-the-destinations" id="toc-extract-the-destinations" class="nav-link" data-scroll-target="#extract-the-destinations">Extract the destinations</a></li>
+  <li><a href="#rds" id="toc-rds" class="nav-link" data-scroll-target="#rds">RDS</a>
+  <ul>
+  <li><a href="#writing" id="toc-writing" class="nav-link" data-scroll-target="#writing">Writing</a></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading">Reading</a></li>
+  </ul></li>
+  <li><a href="#visualising-as-point-symbol-map-tbd" id="toc-visualising-as-point-symbol-map-tbd" class="nav-link" data-scroll-target="#visualising-as-point-symbol-map-tbd">Visualising as point Symbol Map (TBD)</a></li>
+  <li><a href="#importing-master-plan-2019-planning-subzone-boundary-tbd" id="toc-importing-master-plan-2019-planning-subzone-boundary-tbd" class="nav-link" data-scroll-target="#importing-master-plan-2019-planning-subzone-boundary-tbd">Importing Master Plan 2019 Planning Subzone Boundary (TBD)</a></li>
+  <li><a href="#diy-tbd" id="toc-diy-tbd" class="nav-link" data-scroll-target="#diy-tbd">DIY (TBD)</a></li>
+  <li><a href="#diy-2-tbd" id="toc-diy-2-tbd" class="nav-link" data-scroll-target="#diy-2-tbd">DIY 2 (TBD)</a></li>
   </ul>
 </nav>
     </div>
@@ -228,7 +245,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="overview" class="level1">
 <h1>Overview</h1>
-<p>In this exercise, we will be using the Grab Polisi data downloaded the previous week.</p>
+<p>In this exercise, we will be using the GrabPosisi data downloaded the previous week.</p>
 </section>
 <section id="getting-started" class="level1">
 <h1>Getting started</h1>
@@ -240,14 +257,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 class="anchored" data-anchor-id="package-installation">Package installation</h2>
 <p>The following packages will be used and loaded in the R environment for this exercise:</p>
 <ul>
-<li><p>arrow</p></li>
-<li><p>lubridate</p></li>
-<li><p>tmap</p></li>
-<li><p>tidyverse</p></li>
+<li><strong>arrow:</strong> handles databases and data conversions. Allows us to work with Parquet files, which are rare</li>
+<li><strong>lubridate:</strong> helps lubricate data file</li>
+<li>tmap</li>
+<li>tidyverse</li>
 </ul>
 <p>Code chunk:</p>
 <div class="cell">
+<details>
+<summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(arrow, lubridate, tmap, tidyverse, sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
 </div>
 <div class="callout-note callout callout-style-simple no-icon">
 <div class="callout-body d-flex">
@@ -259,9 +279,118 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 </div>
-
-
 </section>
+<section id="importing-the-grab-posisi-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="importing-the-grab-posisi-dataset">Importing the Grab-Posisi Dataset</h2>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Danger
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Warning:</strong> Data is very, very large and will cause RStudio to crash if you upload it to Github. Remember to ensure .gitignore will ignore data/ subdirectories!</p>
+</div>
+</div>
+</section>
+</section>
+<section id="handling-the-data" class="level1">
+<h1>Handling the data</h1>
+<section id="reading-the-grabposisi-data" class="level2">
+<h2 class="anchored" data-anchor-id="reading-the-grabposisi-data">Reading the GrabPosisi data</h2>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">read_parquet</span>(<span class="at">file=</span><span class="st">"../../data/data/GrabPosisi/part-00000-8bbff892-97d2-4011-9961-703e38972569.c000.snappy.parquet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="converting-the-pingtimestamp-to-date_time" class="level2">
+<h2 class="anchored" data-anchor-id="converting-the-pingtimestamp-to-date_time">Converting the pingtimestamp to date_time</h2>
+<p>There was supposed to be a datetime stamp but it wasn’t in that format. As such, the data type needs to be changed</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df<span class="sc">$</span>pingtimestamp <span class="ot">&lt;-</span> <span class="fu">as_datetime</span>(df<span class="sc">$</span>pingtimestamp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="extracting-trip-starting-locations" class="level1">
+<h1>Extracting trip starting locations</h1>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>origin_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(trj_id) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(pingtimestamp) <span class="sc">%&gt;%</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">row_number</span>()<span class="sc">==</span><span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weekday =</span> <span class="fu">wday</span>(pingtimestamp,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label=</span><span class="cn">TRUE</span>,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">abbr=</span><span class="cn">TRUE</span>),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">start_hr=</span> <span class="fu">factor</span>(<span class="fu">hour</span>(pingtimestamp)),</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">day =</span> <span class="fu">factor</span>(<span class="fu">mday</span>(pingtimestamp)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>How this code works: - group by the trip (treat trj_id as trip_id) - arrange it according to the timestamp - get the first row - get dates via wday, factor and mday</p>
+</section>
+<section id="extract-the-destinations" class="level1">
+<h1>Extract the destinations</h1>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>destination_df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(trj_id) <span class="sc">%&gt;%</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(pingtimestamp)) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">row_number</span>()<span class="sc">==</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">weekday =</span> <span class="fu">wday</span>(pingtimestamp,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">label=</span><span class="cn">TRUE</span>,</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>                        <span class="at">abbr=</span><span class="cn">TRUE</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">end_hr=</span> <span class="fu">factor</span>(<span class="fu">hour</span>(pingtimestamp)),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">day =</span> <span class="fu">factor</span>(<span class="fu">mday</span>(pingtimestamp)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="rds" class="level1">
+<h1>RDS</h1>
+<section id="writing" class="level2">
+<h2 class="anchored" data-anchor-id="writing">Writing</h2>
+<p>Now, we will write it to a separate rds file:</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(origin_df, <span class="st">"data/rds/origin_df.rds"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write_rds</span>(destination_df, <span class="st">"data/rds/destination_df.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="reading" class="level2">
+<h2 class="anchored" data-anchor-id="reading">Reading</h2>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>origin_df <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/origin_df.rds"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>destination_df <span class="ot">&lt;-</span> <span class="fu">read_rds</span>(<span class="st">"data/rds/destination_df.rds"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+</section>
+<section id="visualising-as-point-symbol-map-tbd" class="level1">
+<h1>Visualising as point Symbol Map (TBD)</h1>
+</section>
+<section id="importing-master-plan-2019-planning-subzone-boundary-tbd" class="level1">
+<h1>Importing Master Plan 2019 Planning Subzone Boundary (TBD)</h1>
+</section>
+<section id="diy-tbd" class="level1">
+<h1>DIY (TBD)</h1>
+</section>
+<section id="diy-2-tbd" class="level1">
+<h1>DIY 2 (TBD)</h1>
+
+
 </section>
 
 </main> <!-- /main -->
