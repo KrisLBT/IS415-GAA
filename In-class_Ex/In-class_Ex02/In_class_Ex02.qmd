@@ -155,20 +155,27 @@ mpsz2019 <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
 head(mpsz2019)
 ```
 
-We then realise that the CRS is WGS84 and have to change the CRS to 3414
+We then realise that the CRS is WGS84 and have to change the CRS to 3414.
+
+
 
 ```{r}
 #| eval: FALSE
 #| warning: false
-mpsz2019_3414 <- st_transform(mpsz2019,3414)
+mpsz2019_3414 <-mpsz2019 %>% st_transform(3414)
 ```
 
 Next, I will be trying to create the base shape of the Master Plan 2019
 
+
 ```{r}
 #| eval: FALSE
-
-head(mpsz2019_3414)
+# this does not work. Plotting gives this error
+#Error in scan(text = lst[[length(lst)]], quiet = TRUE) : 
+#  scan() expected 'a real', got 'IllegalArgumentException:'
+#Error in (function (msg)  : 
+#  IllegalArgumentException: Points of LinearRing do not form a closed linestring
+plot(mpsz2019_3414)
 ```
 
 # DIY (TBD)
