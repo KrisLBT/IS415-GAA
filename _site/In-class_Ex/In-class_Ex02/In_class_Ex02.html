@@ -211,8 +211,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#writing" id="toc-writing" class="nav-link" data-scroll-target="#writing">Writing</a></li>
   <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading">Reading</a></li>
   </ul></li>
-  <li><a href="#visualising-as-point-symbol-map-tbd" id="toc-visualising-as-point-symbol-map-tbd" class="nav-link" data-scroll-target="#visualising-as-point-symbol-map-tbd">Visualising as point Symbol Map (TBD)</a></li>
+  <li><a href="#visualising-as-point-symbol-map-tbd" id="toc-visualising-as-point-symbol-map-tbd" class="nav-link" data-scroll-target="#visualising-as-point-symbol-map-tbd">Visualising as Point Symbol Map (TBD)</a>
+  <ul>
   <li><a href="#importing-master-plan-2019-planning-subzone-boundary-tbd" id="toc-importing-master-plan-2019-planning-subzone-boundary-tbd" class="nav-link" data-scroll-target="#importing-master-plan-2019-planning-subzone-boundary-tbd">Importing Master Plan 2019 Planning Subzone Boundary (TBD)</a></li>
+  </ul></li>
   <li><a href="#diy-tbd" id="toc-diy-tbd" class="nav-link" data-scroll-target="#diy-tbd">DIY (TBD)</a></li>
   <li><a href="#diy-2-tbd" id="toc-diy-2-tbd" class="nav-link" data-scroll-target="#diy-2-tbd">DIY 2 (TBD)</a></li>
   </ul>
@@ -379,10 +381,57 @@ Danger
 </section>
 </section>
 <section id="visualising-as-point-symbol-map-tbd" class="level1">
-<h1>Visualising as point Symbol Map (TBD)</h1>
+<h1>Visualising as Point Symbol Map (TBD)</h1>
+<p>Next, we will be visualising the origin and destinations in GrabPosisi. ## Converting from RDS to simple feature</p>
+<p>We convert the RDS to simple feature.</p>
+<p>Also, note the projected crs in the data. It is in wgs84, which needs to be converted to crs 3414.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>origin_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(origin_df, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"rawlng"</span>, <span class="st">"rawlat"</span>),</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">crs=</span><span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs=</span><span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>destination_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(destination_df, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                           <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"rawlng"</span>, <span class="st">"rawlat"</span>), </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                           <span class="at">crs=</span><span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<section id="importing-master-plan-2019-planning-subzone-boundary-tbd" class="level2">
+<h2 class="anchored" data-anchor-id="importing-master-plan-2019-planning-subzone-boundary-tbd">Importing Master Plan 2019 Planning Subzone Boundary (TBD)</h2>
+<p>First, we will import the polygon feature data in kml format</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mpsz2019 <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mpsz2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We then realise that the CRS is WGS84 and have to change the CRS to 3414</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mpsz2019_3414 <span class="ot">&lt;-</span> <span class="fu">st_transform</span>(mpsz2019,<span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Next, I will be trying to create the base shape of the Master Plan 2019</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mpsz2019_3414)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 </section>
-<section id="importing-master-plan-2019-planning-subzone-boundary-tbd" class="level1">
-<h1>Importing Master Plan 2019 Planning Subzone Boundary (TBD)</h1>
 </section>
 <section id="diy-tbd" class="level1">
 <h1>DIY (TBD)</h1>

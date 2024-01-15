@@ -121,9 +121,55 @@ destination_df <- read_rds("data/rds/destination_df.rds")
 
 ```
 
-# Visualising as point Symbol Map (TBD)
+# Visualising as Point Symbol Map (TBD)
+Next, we will be visualising the origin and destinations in GrabPosisi.
+## Converting from RDS to simple feature
 
-# Importing Master Plan 2019 Planning Subzone Boundary (TBD)
+We convert the RDS to simple feature.
+
+Also, note the projected crs in the data. It is in wgs84, which needs to be converted to crs 3414.
+
+```{r}
+#| eval: FALSE
+origin_sf <- st_as_sf(origin_df, coords = c("rawlng", "rawlat"),
+                       crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+```{r}
+destination_sf <- st_as_sf(destination_df, 
+                           coords = c("rawlng", "rawlat"), 
+                           crs=4326) %>%
+  st_transform(crs = 3414)
+```
+## Importing Master Plan 2019 Planning Subzone Boundary (TBD)
+First, we will import the polygon feature data in kml format
+
+```{r}
+#| eval: FALSE
+mpsz2019 <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
+```
+```{r}
+#| eval: FALSE
+
+head(mpsz2019)
+```
+
+We then realise that the CRS is WGS84 and have to change the CRS to 3414
+
+```{r}
+#| eval: FALSE
+#| warning: false
+mpsz2019_3414 <- st_transform(mpsz2019,3414)
+```
+
+Next, I will be trying to create the base shape of the Master Plan 2019
+
+```{r}
+#| eval: FALSE
+
+head(mpsz2019_3414)
+```
 
 # DIY (TBD)
 
