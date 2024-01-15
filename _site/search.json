@@ -1,5 +1,12 @@
 [
   {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
+    "title": "In-class Exercise 2",
+    "section": "",
+    "text": "In this exercise, we will be using the Grab Polisi data downloaded the previous week."
+  },
+  {
     "objectID": "about.html",
     "href": "about.html",
     "title": "About",
@@ -250,5 +257,19 @@
     "title": "IS415-GAA",
     "section": "",
     "text": "This is the course website for IS415 in AY2022/2023 Semester 2 and is where you can find my course work done for this module."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#folder-creation",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#folder-creation",
+    "title": "In-class Exercise 2",
+    "section": "Folder creation",
+    "text": "Folder creation\nUsing the file navigation in RStudio, create a new subdirectory for the second in-class exercise."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
+    "title": "In-class Exercise 2",
+    "section": "Package installation",
+    "text": "Package installation\nThe following packages will be used and loaded in the R environment for this exercise:\n\narrow\nlubridate\ntmap\ntidyverse\n\nCode chunk:\n\npacman::p_load(arrow, lubridate, tmap, tidyverse, sf)\n\n\n\n\n\n\n\nNote: saw callout notes on prof’s code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don’t have to constantly toggle between the two modes"
   }
 ]

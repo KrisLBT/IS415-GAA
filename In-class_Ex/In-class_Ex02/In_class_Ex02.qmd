@@ -1,6 +1,40 @@
 ---
-title: "In-class Exercise 1"
+title: "In-class Exercise 2"
 execute:
   warning: False
 date: "`r Sys.Date()`"
 ---
+
+# Overview
+
+In this exercise, we will be using the Grab Polisi data downloaded the previous week.
+
+# Getting started
+
+## Folder creation
+
+Using the file navigation in RStudio, create a new subdirectory for the second in-class exercise.
+
+## Package installation
+
+The following packages will be used and loaded in the R environment for this exercise:
+
+-   arrow
+
+-   lubridate
+
+-   tmap
+
+-   tidyverse
+
+Code chunk:
+
+```{r}
+pacman::p_load(arrow, lubridate, tmap, tidyverse, sf)
+```
+
+::: {.callout-note appearance="minimal"}
+Note: saw callout notes on prof's code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don't have to constantly toggle between the two modes
+:::
+
+
