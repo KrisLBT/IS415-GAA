@@ -1,0 +1,86 @@
+---
+title: "Hands-on Exercise 3"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+# Introduction
+
+In this exercse, we will be learning about 1st order Spatial Point Patterns Analysis
+
+# Setting Up
+
+## The Data
+
+The following datasets will be used
+
+-   CHILDCARE which was downloaded from [data.gov.sg](https://beta.data.gov.sg/collections/2015/view)
+-   2014 Master Plan Subzone Boundary (No Sea) which was downloaded from [data.gov.sg](https://beta.data.gov.sg/collections/1707/view)
+-   CoastalOutline, which was derived from 2019 Master Plan Subzone Boundary (No Sea). It was downloaded from [data.gov.sg](https://beta.data.gov.sg/collections/1749/view)
+
+## Downloading Packages
+
+The following packages will be used:
+
+-   maptools
+-   sf
+-   raster
+-   spatstat
+-   tmap
+
+```{r}
+#| warning: FALSE
+pacman::p_load(maptools, sf, raster, spatstat, tmap)
+```
+
+As there may be issues with installing maptools, you may use the following:
+
+```{r}
+#| eval: False
+install.packages("maptools", repos = "https://packagemanager.posit.co/cran/2023-10-13")
+```
+## Creating CoastalOutline
+
+Import the 2019 Master Plan Subzone Boundary
+
+```{r}
+#| eval: False
+#| warning: FALSE
+MPSZ2019 <- st_read("../../data/data/MPSZ2019.kml") %>%
+  st_transform(3414)
+```
+```{r}
+#| eval: False
+CoastalOutline <- st_boundary(MPSZ2019)
+```
+
+
+```{r}
+#| eval: False
+plot(CoastalOutline)
+```
+
+
+# Spatial Data Wrangling
+## Importing the Spatial Data
+Import the spatial data using st_read().
+
+```{r}
+childcare_sf <- st_read("../../data/data/ChildCareServices.geojson") %>%
+  st_transform(crs = 3414)
+```
+```{r}
+mpsz_sf <- st_read(dsn = "../../data/data", 
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+
