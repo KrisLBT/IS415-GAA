@@ -142,42 +142,52 @@ destination_sf <- st_as_sf(destination_df,
                            crs=4326) %>%
   st_transform(crs = 3414)
 ```
-## Importing Master Plan 2019 Planning Subzone Boundary (TBD)
+## Visualising the Frequency Distribution
+
+Next, I will be showing the distribution of origin trips by the day of the week.
+
+```{r}
+#| eval: FALSE
+ggplot(data=origin_df, 
+       aes(x=weekday)) + 
+  geom_bar()
+```
+As can be seen, the number of trips daily seem to be fairly equally distributed throughout the week.
+
+## Visualising as Point Symbol Map
+
+We also want to visualise the geospatial distribution of origin points.
+
+```{r}
+#| eval: False
+tmap_mode("plot")
+tm_shape(origin_sf) +
+  tm_dots()
+```
+
+While the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore.
+
+# Importing Master Plan 2019 Planning Subzone Boundary
 First, we will import the polygon feature data in kml format
 
-```{r}
-#| eval: FALSE
-mpsz2019 <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
-```
-```{r}
-#| eval: FALSE
-
-head(mpsz2019)
-```
-
-We then realise that the CRS is WGS84 and have to change the CRS to 3414.
-
-
+## DIY
 
 ```{r}
 #| eval: FALSE
-#| warning: false
-mpsz2019_3414 <-mpsz2019 %>% st_transform(3414)
+#| warning: FALSE
+mpsz2019 <- st_read("data/geospatial/MPSZ2019.kml") %>%
+  st_transform(crs=3414)
 ```
 
-Next, I will be trying to create the base shape of the Master Plan 2019
+Next, I will be trying to merge the dots with the base layer.
 
+
+## DIY 2
 
 ```{r}
-#| eval: FALSE
-# this does not work. Plotting gives this error
-#Error in scan(text = lst[[length(lst)]], quiet = TRUE) : 
-#  scan() expected 'a real', got 'IllegalArgumentException:'
-#Error in (function (msg)  : 
-#  IllegalArgumentException: Points of LinearRing do not form a closed linestring
-plot(mpsz2019_3414)
+#| eval: False
+tm_shape(mpsz2019) +
+  tm_polygons() +
+tm_shape(origin_sf) +
+  tm_dots()
 ```
-
-# DIY (TBD)
-
-# DIY 2 (TBD)

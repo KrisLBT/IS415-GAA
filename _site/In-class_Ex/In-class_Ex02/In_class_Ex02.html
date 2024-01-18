@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-01-15">
+<meta name="dcterms.date" content="2024-01-18">
 
 <title>IS415-GAA - In-class Exercise 2</title>
 <style>
@@ -213,10 +213,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#visualising-as-point-symbol-map-tbd" id="toc-visualising-as-point-symbol-map-tbd" class="nav-link" data-scroll-target="#visualising-as-point-symbol-map-tbd">Visualising as Point Symbol Map (TBD)</a>
   <ul>
-  <li><a href="#importing-master-plan-2019-planning-subzone-boundary-tbd" id="toc-importing-master-plan-2019-planning-subzone-boundary-tbd" class="nav-link" data-scroll-target="#importing-master-plan-2019-planning-subzone-boundary-tbd">Importing Master Plan 2019 Planning Subzone Boundary (TBD)</a></li>
+  <li><a href="#visualising-the-frequency-distribution" id="toc-visualising-the-frequency-distribution" class="nav-link" data-scroll-target="#visualising-the-frequency-distribution">Visualising the Frequency Distribution</a></li>
+  <li><a href="#visualising-as-point-symbol-map" id="toc-visualising-as-point-symbol-map" class="nav-link" data-scroll-target="#visualising-as-point-symbol-map">Visualising as Point Symbol Map</a></li>
   </ul></li>
-  <li><a href="#diy-tbd" id="toc-diy-tbd" class="nav-link" data-scroll-target="#diy-tbd">DIY (TBD)</a></li>
-  <li><a href="#diy-2-tbd" id="toc-diy-2-tbd" class="nav-link" data-scroll-target="#diy-2-tbd">DIY 2 (TBD)</a></li>
+  <li><a href="#importing-master-plan-2019-planning-subzone-boundary" id="toc-importing-master-plan-2019-planning-subzone-boundary" class="nav-link" data-scroll-target="#importing-master-plan-2019-planning-subzone-boundary">Importing Master Plan 2019 Planning Subzone Boundary</a>
+  <ul>
+  <li><a href="#diy" id="toc-diy" class="nav-link" data-scroll-target="#diy">DIY</a></li>
+  <li><a href="#diy-2" id="toc-diy-2" class="nav-link" data-scroll-target="#diy-2">DIY 2</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -236,7 +240,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">January 15, 2024</p>
+      <p class="date">January 18, 2024</p>
     </div>
   </div>
     
@@ -402,49 +406,61 @@ Danger
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<section id="importing-master-plan-2019-planning-subzone-boundary-tbd" class="level2">
-<h2 class="anchored" data-anchor-id="importing-master-plan-2019-planning-subzone-boundary-tbd">Importing Master Plan 2019 Planning Subzone Boundary (TBD)</h2>
+<section id="visualising-the-frequency-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-the-frequency-distribution">Visualising the Frequency Distribution</h2>
+<p>Next, I will be showing the distribution of origin trips by the day of the week.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>origin_df, </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span>weekday)) <span class="sc">+</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>As can be seen, the number of trips daily seem to be fairly equally distributed throughout the week.</p>
+</section>
+<section id="visualising-as-point-symbol-map" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-as-point-symbol-map">Visualising as Point Symbol Map</h2>
+<p>We also want to visualise the geospatial distribution of origin points.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(origin_sf) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>While the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore.</p>
+</section>
+</section>
+<section id="importing-master-plan-2019-planning-subzone-boundary" class="level1">
+<h1>Importing Master Plan 2019 Planning Subzone Boundary</h1>
 <p>First, we will import the polygon feature data in kml format</p>
+<section id="diy" class="level2">
+<h2 class="anchored" data-anchor-id="diy">DIY</h2>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mpsz2019 <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mpsz2019 <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="st">"data/geospatial/MPSZ2019.kml"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs=</span><span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(mpsz2019)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>We then realise that the CRS is WGS84 and have to change the CRS to 3414.</p>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>mpsz2019_3414 <span class="ot">&lt;-</span>mpsz2019 <span class="sc">%&gt;%</span> <span class="fu">st_transform</span>(<span class="dv">3414</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<p>Next, I will be trying to create the base shape of the Master Plan 2019</p>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># this does not work. Plotting gives this error</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co">#Error in scan(text = lst[[length(lst)]], quiet = TRUE) : </span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">#  scan() expected 'a real', got 'IllegalArgumentException:'</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="co">#Error in (function (msg)  : </span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">#  IllegalArgumentException: Points of LinearRing do not form a closed linestring</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mpsz2019_3414)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<p>Next, I will be trying to merge the dots with the base layer.</p>
 </section>
-</section>
-<section id="diy-tbd" class="level1">
-<h1>DIY (TBD)</h1>
-</section>
-<section id="diy-2-tbd" class="level1">
-<h1>DIY 2 (TBD)</h1>
+<section id="diy-2" class="level2">
+<h2 class="anchored" data-anchor-id="diy-2">DIY 2</h2>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz2019) <span class="sc">+</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(origin_sf) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
