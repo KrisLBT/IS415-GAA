@@ -48,39 +48,141 @@ As there may be issues with installing maptools, you may use the following:
 #| eval: False
 install.packages("maptools", repos = "https://packagemanager.posit.co/cran/2023-10-13")
 ```
-## Creating CoastalOutline
-
-Import the 2019 Master Plan Subzone Boundary
-
-```{r}
-#| eval: False
-#| warning: FALSE
-MPSZ2019 <- st_read("../../data/data/MPSZ2019.kml") %>%
-  st_transform(3414)
-```
-```{r}
-#| eval: False
-CoastalOutline <- st_boundary(MPSZ2019)
-```
-
-
-```{r}
-#| eval: False
-plot(CoastalOutline)
-```
-
 
 # Spatial Data Wrangling
+
 ## Importing the Spatial Data
+
 Import the spatial data using st_read().
 
 ```{r}
-childcare_sf <- st_read("../../data/data/ChildCareServices.geojson") %>%
+childcare_sf <- st_read("data/child-care-services-geojson.geojson") %>%
   st_transform(crs = 3414)
 ```
+
 ```{r}
-mpsz_sf <- st_read(dsn = "../../data/data", 
+mpsz_sf <- st_read(dsn = "data", 
                 layer = "MP14_SUBZONE_WEB_PL")
 ```
+
+```{r}
+sg_sf <-
+  st_read(dsn="data",
+          layer= "CostalOutline")
+```
+
+# DIY
+
+From here, we will check the referencing system.
+
+```{r}
+st_crs(childcare_sf)
+```
+
+```{r}
+st_crs(mpsz_sf)
+```
+
+```{r}
+st_crs(sg_sf)
+```
+
+childcare_sf and mpsz_sf both do not have the correct crs so we will need to set it to CRS = 3414.
+
+# DIY 2
+
+Now, I will be setting the CRS to the correct one.Both are in SVY21/Singapore TM
+
+```{r}
+#| warnings: False
+mpsz_sf <- st_set_crs(mpsz_sf, 3414)
+```
+
+```{r}
+#|warnings: False
+sg_sf <- st_set_crs(sg_sf, 3414)
+```
+
+# Mapping the geospatial data sets
+
+We can plot a map to show the spatial patterns of our data.
+
+```{r}
+tm_shape(mpsz_sf)+
+  tm_polygons() +
+tm_shape(childcare_sf) +
+  tm_dots()
+```
+
+We can also create a pin map as shown below:
+
+```{r}
+tmap_mode("view")
+tm_shape(childcare_sf)+
+  tm_dots()
+```
+
+```{r}
+tmap_mode("plot")
+```
+
+::: callout-caution
+## Caution
+
+Always remember to switch back to plot mode after the interactive map. This is because, each interactive mode will consume a connection. You should also avoid displaying ecessive numbers of interactive maps (i.e. not more than 10) in one RMarkdown document when publishing on Netlify.
+:::
+
+# Geospatial Data wrangling
+
+Although simple feature data frame is gaining popularity again sp’s Spatial* classes, there are, however, many geospatial analysis packages require the input geospatial data in sp’s Spatial* classes. In this section, you will learn how to convert simple feature data frame to sp’s Spatial* class.
+
+## Converting sf data frames to sp’s Spatial* class --> idk
+
+```{r}
+childcare <- as_Spatial(childcare_sf)
+mpsz <- as_Spatial(mpsz_sf)
+sg <- as_Spatial(sg_sf)
+```
+
+```{r}
+print(mpsz)
+```
+```{r}
+print(childcare)
+```
+```{r}
+print(sg)
+```
+## Converting the Spatial* class into generic sp format
+
+```{r}
+childcare_sp <- as(childcare, "SpatialPoints")
+sg_sp <- as(sg, "SpatialPolygons")
+```
+
+```{r}
+print(childcare_sp)
+```
+```{r}
+print(sg_sp)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
