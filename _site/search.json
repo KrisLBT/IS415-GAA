@@ -259,116 +259,11 @@
     "text": "Downloading Packages\nThe following packages will be used:\n\nmaptools\nsf\nraster\nspatstat\ntmap\n\n\n\nShow the code\npacman::p_load(maptools, sf, raster, spatstat, tmap)\n\n\nAs there may be issues with installing maptools, you may use the following:\n\n\nShow the code\ninstall.packages(\"maptools\", repos = \"https://packagemanager.posit.co/cran/2023-10-13\")"
   },
   {
-    "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#creating-coastaloutline",
-    "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#creating-coastaloutline",
-    "title": "Hands-on Exercise 3",
-    "section": "Creating CoastalOutline",
-    "text": "Creating CoastalOutline\nImport the 2019 Master Plan Subzone Boundary\n\n\nShow the code\nMPSZ2019 <- st_read(\"../../data/data/MPSZ2019.kml\") %>%\n  st_transform(3414)\n\n\n\n\nShow the code\nCoastalOutline <- st_boundary(MPSZ2019)\n\n\n\n\nShow the code\nplot(CoastalOutline)"
-  },
-  {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#importing-the-spatial-data",
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#importing-the-spatial-data",
     "title": "Hands-on Exercise 3 and 4",
     "section": "Importing the Spatial Data",
     "text": "Importing the Spatial Data\nImport the spatial data using st_read().\n\n\nShow the code\nchildcare_sf <- st_read(\"data/child-care-services-geojson.geojson\") %>%\n  st_transform(crs = 3414)\n\n\nReading layer `child-care-services-geojson' from data source \n  `D:\\KrisLBT\\IS415-GAA\\Hands-on_Ex\\Hands-on_Ex03\\data\\child-care-services-geojson.geojson' \n  using driver `GeoJSON'\nSimple feature collection with 1545 features and 2 fields\nGeometry type: POINT\nDimension:     XYZ\nBounding box:  xmin: 103.6824 ymin: 1.248403 xmax: 103.9897 ymax: 1.462134\nz_range:       zmin: 0 zmax: 0\nGeodetic CRS:  WGS 84\n\n\n\n\nShow the code\nmpsz_sf <- st_read(dsn = \"data\", \n                layer = \"MP14_SUBZONE_WEB_PL\")\n\n\nReading layer `MP14_SUBZONE_WEB_PL' from data source \n  `D:\\KrisLBT\\IS415-GAA\\Hands-on_Ex\\Hands-on_Ex03\\data' using driver `ESRI Shapefile'\nSimple feature collection with 323 features and 15 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2667.538 ymin: 15748.72 xmax: 56396.44 ymax: 50256.33\nProjected CRS: SVY21\n\n\n\n\nShow the code\nsg_sf <-\n  st_read(dsn=\"data\",\n          layer= \"CostalOutline\")\n\n\nReading layer `CostalOutline' from data source \n  `D:\\KrisLBT\\IS415-GAA\\Hands-on_Ex\\Hands-on_Ex03\\data' using driver `ESRI Shapefile'\nSimple feature collection with 60 features and 4 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 2663.926 ymin: 16357.98 xmax: 56047.79 ymax: 50244.03\nProjected CRS: SVY21"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex01/In_class_Ex01.html",
-    "href": "In-class_Ex/In-class_Ex01/In_class_Ex01.html",
-    "title": "In-class Exercise 1",
-    "section": "",
-    "text": "Hello"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
-    "title": "In-class Exercise 2",
-    "section": "",
-    "text": "In this exercise, we will be using the GrabPosisi data downloaded the previous week."
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#folder-creation",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#folder-creation",
-    "title": "In-class Exercise 2",
-    "section": "Folder creation",
-    "text": "Folder creation\nUsing the file navigation in RStudio, create a new subdirectory for the second in-class exercise."
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
-    "title": "In-class Exercise 2",
-    "section": "Package installation",
-    "text": "Package installation\nThe following packages will be used and loaded in the R environment for this exercise:\n\narrow: handles databases and data conversions. Allows us to work with Parquet files, which are rare\nlubridate: helps lubricate data file\ntmap\ntidyverse\n\nCode chunk:\n\n\nShow the code\npacman::p_load(arrow, lubridate, tmap, tidyverse, sf)\n\n\n\n\n\n\n\n\nNote: saw callout notes on prof’s code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don’t have to constantly toggle between the two modes"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#importing-the-grab-posisi-dataset",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#importing-the-grab-posisi-dataset",
-    "title": "In-class Exercise 2",
-    "section": "Importing the Grab-Posisi Dataset",
-    "text": "Importing the Grab-Posisi Dataset\n\n\n\n\n\n\nDanger\n\n\n\nWarning: Data is very, very large and will cause RStudio to crash if you upload it to Github. Remember to ensure .gitignore will ignore data/ subdirectories!"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading-the-grabposisi-data",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading-the-grabposisi-data",
-    "title": "In-class Exercise 2",
-    "section": "Reading the GrabPosisi data",
-    "text": "Reading the GrabPosisi data\n\n\nShow the code\ndf <- read_parquet(file=\"../../data/data/GrabPosisi/part-00000-8bbff892-97d2-4011-9961-703e38972569.c000.snappy.parquet\")"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#converting-the-pingtimestamp-to-date_time",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#converting-the-pingtimestamp-to-date_time",
-    "title": "In-class Exercise 2",
-    "section": "Converting the pingtimestamp to date_time",
-    "text": "Converting the pingtimestamp to date_time\nThere was supposed to be a datetime stamp but it wasn’t in that format. As such, the data type needs to be changed\n\n\nShow the code\ndf$pingtimestamp <- as_datetime(df$pingtimestamp)"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#writing",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#writing",
-    "title": "In-class Exercise 2",
-    "section": "Writing",
-    "text": "Writing\nNow, we will write it to a separate rds file:\n\n\nShow the code\nwrite_rds(origin_df, \"data/rds/origin_df.rds\")\nwrite_rds(destination_df, \"data/rds/destination_df.rds\")"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading",
-    "title": "In-class Exercise 2",
-    "section": "Reading",
-    "text": "Reading\n\n\nShow the code\norigin_df <- read_rds(\"data/rds/origin_df.rds\")\ndestination_df <- read_rds(\"data/rds/destination_df.rds\")"
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-the-frequency-distribution",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-the-frequency-distribution",
-    "title": "In-class Exercise 2",
-    "section": "Visualising the Frequency Distribution",
-    "text": "Visualising the Frequency Distribution\nNext, I will be showing the distribution of origin trips by the day of the week.\n\n\nShow the code\nggplot(data=origin_df, \n       aes(x=weekday)) + \n  geom_bar()\n\n\n\n\n\nAs can be seen, the number of trips daily seem to be fairly equally distributed throughout the week."
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-as-point-symbol-map",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-as-point-symbol-map",
-    "title": "In-class Exercise 2",
-    "section": "Visualising as Point Symbol Map",
-    "text": "Visualising as Point Symbol Map\nWe also want to visualise the geospatial distribution of origin points.\n\n\nShow the code\ntmap_mode(\"plot\")\ntm_shape(origin_sf) +\n  tm_dots()\n\n\n\n\n\nWhile the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore."
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy",
-    "title": "In-class Exercise 2",
-    "section": "DIY",
-    "text": "DIY\n\n\nShow the code\nmpsz2019 <- st_read(\"data/geospatial/MPSZ2019.kml\") %>%\n  st_transform(crs=3414)\n\n\nReading layer `URA_MP19_SUBZONE_NO_SEA_PL' from data source \n  `D:\\KrisLBT\\IS415-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial\\MPSZ2019.kml' \n  using driver `KML'\nSimple feature collection with 332 features and 2 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY, XYZ\nBounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775\nz_range:       zmin: 0 zmax: 0\nGeodetic CRS:  WGS 84\n\n\nNext, I will be trying to merge the dots with the base layer."
-  },
-  {
-    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy-2",
-    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy-2",
-    "title": "In-class Exercise 2",
-    "section": "DIY 2",
-    "text": "DIY 2\n\n\nShow the code\ntm_shape(mpsz2019) +\n  tm_polygons() +\ntm_shape(origin_sf) +\n  tm_dots()"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "IS415-GAA",
-    "section": "",
-    "text": "This is the course website for IS415 in AY2022/2023 Semester 2 and is where you can find my course work done for this module."
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#converting-sf-data-frames-to-sps-spatial-class-idk",
@@ -487,14 +382,14 @@
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#clark-and-evans-test-choa-chu-kang-planning-area",
     "title": "Hands-on Exercise 3 and 4",
     "section": "Clark and Evans Test: Choa Chu Kang planning area",
-    "text": "Clark and Evans Test: Choa Chu Kang planning area\nIn the code chunk below, clarkevans.test() of spatstat is used to performs Clark-Evans test of aggregation for childcare centre in Choa Chu Kang planning area.\n\n\nShow the code\nclarkevans.test(childcare_ck_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n\n    Clark-Evans test\n    No edge correction\n    Z-test\n\ndata:  childcare_ck_ppp\nR = 0.95209, p-value = 0.4741\nalternative hypothesis: two-sided\n\n\nConclusion: we do not reject null hypothesis"
+    "text": "Clark and Evans Test: Choa Chu Kang planning area\nIn the code chunk below, clarkevans.test() of spatstat is used to performs Clark-Evans test of aggregation for childcare centre in Choa Chu Kang planning area.\n\n\nShow the code\nclarkevans.test(childcare_ck_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n\n    Clark-Evans test\n    No edge correction\n    Z-test\n\ndata:  childcare_ck_ppp\nR = 0.93992, p-value = 0.3694\nalternative hypothesis: two-sided\n\n\nConclusion: we do not reject null hypothesis"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#clark-and-evans-test-tampines-planning-area",
     "href": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#clark-and-evans-test-tampines-planning-area",
     "title": "Hands-on Exercise 3 and 4",
     "section": "Clark and Evans Test: Tampines planning area",
-    "text": "Clark and Evans Test: Tampines planning area\n\n\nShow the code\nclarkevans.test(childcare_tm_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n\n    Clark-Evans test\n    No edge correction\n    Z-test\n\ndata:  childcare_tm_ppp\nR = 0.78152, p-value = 8.042e-05\nalternative hypothesis: two-sided\n\n\nConclusion: We reject the null hypothesis"
+    "text": "Clark and Evans Test: Tampines planning area\n\n\nShow the code\nclarkevans.test(childcare_tm_ppp,\n                correction=\"none\",\n                clipregion=NULL,\n                alternative=c(\"two.sided\"),\n                nsim=999)\n\n\n\n    Clark-Evans test\n    No edge correction\n    Z-test\n\ndata:  childcare_tm_ppp\nR = 0.80729, p-value = 0.0005054\nalternative hypothesis: two-sided\n\n\nConclusion: We reject the null hypothesis"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html#choa-chu-kang-planning-area",
@@ -551,6 +446,104 @@
     "title": "Hands-on Exercise 3 and 4",
     "section": "Tampines planning area",
     "text": "Tampines planning area\n\nComputing L-function estimate\n\n\nShow the code\nL_tm = Lest(childcare_tm_ppp, correction = \"Ripley\")\nplot(L_tm, . -r ~ r, \n     ylab= \"L(d)-r\", xlab = \"d(m)\", \n     xlim=c(0,1000))\n\n\n\n\n\n\n\nPerforming Complete Spatial Randomness Test\nTo confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:\nHo = The distribution of childcare services at Tampines are randomly distributed.\nH1= The distribution of childcare services at Tampines are not randomly distributed.\nThe null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.\nThe code chunk below will be used to perform the hypothesis testing.\n\n\nShow the code\nL_tm.csr <- envelope(childcare_tm_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)\n\n\nGenerating 99 simulations of CSR  ...\n1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,\n21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,\n41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,\n61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,\n81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, \n99.\n\nDone.\n\n\n\n\nShow the code\nplot(L_tm.csr, . - r ~ r, \n     xlab=\"d\", ylab=\"L(d)-r\", xlim=c(0,500))"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex01/In_class_Ex01.html",
+    "href": "In-class_Ex/In-class_Ex01/In_class_Ex01.html",
+    "title": "In-class Exercise 1",
+    "section": "",
+    "text": "Hello"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html",
+    "title": "In-class Exercise 2",
+    "section": "",
+    "text": "In this exercise, we will be using the GrabPosisi data downloaded the previous week."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#folder-creation",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#folder-creation",
+    "title": "In-class Exercise 2",
+    "section": "Folder creation",
+    "text": "Folder creation\nUsing the file navigation in RStudio, create a new subdirectory for the second in-class exercise."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#package-installation",
+    "title": "In-class Exercise 2",
+    "section": "Package installation",
+    "text": "Package installation\nThe following packages will be used and loaded in the R environment for this exercise:\n\narrow: handles databases and data conversions. Allows us to work with Parquet files, which are rare\nlubridate: helps lubricate data file\ntmap\ntidyverse\n\nCode chunk:\n\n\nShow the code\npacman::p_load(arrow, lubridate, tmap, tidyverse, sf)\n\n\n\n\n\n\n\n\nNote: saw callout notes on prof’s code, thought it looked cool. I can access it from the Visual tab but being able to write it in the source code seemed useful so I don’t have to constantly toggle between the two modes"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#importing-the-grab-posisi-dataset",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#importing-the-grab-posisi-dataset",
+    "title": "In-class Exercise 2",
+    "section": "Importing the Grab-Posisi Dataset",
+    "text": "Importing the Grab-Posisi Dataset\n\n\n\n\n\n\nDanger\n\n\n\nWarning: Data is very, very large and will cause RStudio to crash if you upload it to Github. Remember to ensure .gitignore will ignore data/ subdirectories!"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading-the-grabposisi-data",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading-the-grabposisi-data",
+    "title": "In-class Exercise 2",
+    "section": "Reading the GrabPosisi data",
+    "text": "Reading the GrabPosisi data\n\n\nShow the code\ndf <- read_parquet(file=\"../../data/data/GrabPosisi/part-00000-8bbff892-97d2-4011-9961-703e38972569.c000.snappy.parquet\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#converting-the-pingtimestamp-to-date_time",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#converting-the-pingtimestamp-to-date_time",
+    "title": "In-class Exercise 2",
+    "section": "Converting the pingtimestamp to date_time",
+    "text": "Converting the pingtimestamp to date_time\nThere was supposed to be a datetime stamp but it wasn’t in that format. As such, the data type needs to be changed\n\n\nShow the code\ndf$pingtimestamp <- as_datetime(df$pingtimestamp)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#writing",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#writing",
+    "title": "In-class Exercise 2",
+    "section": "Writing",
+    "text": "Writing\nNow, we will write it to a separate rds file:\n\n\nShow the code\nwrite_rds(origin_df, \"data/rds/origin_df.rds\")\nwrite_rds(destination_df, \"data/rds/destination_df.rds\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#reading",
+    "title": "In-class Exercise 2",
+    "section": "Reading",
+    "text": "Reading\n\n\nShow the code\norigin_df <- read_rds(\"data/rds/origin_df.rds\")\ndestination_df <- read_rds(\"data/rds/destination_df.rds\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-the-frequency-distribution",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-the-frequency-distribution",
+    "title": "In-class Exercise 2",
+    "section": "Visualising the Frequency Distribution",
+    "text": "Visualising the Frequency Distribution\nNext, I will be showing the distribution of origin trips by the day of the week.\n\n\nShow the code\nggplot(data=origin_df, \n       aes(x=weekday)) + \n  geom_bar()\n\n\n\n\n\nAs can be seen, the number of trips daily seem to be fairly equally distributed throughout the week."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-as-point-symbol-map",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#visualising-as-point-symbol-map",
+    "title": "In-class Exercise 2",
+    "section": "Visualising as Point Symbol Map",
+    "text": "Visualising as Point Symbol Map\nWe also want to visualise the geospatial distribution of origin points.\n\n\nShow the code\ntmap_mode(\"plot\")\ntm_shape(origin_sf) +\n  tm_dots()\n\n\n\n\n\nWhile the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy",
+    "title": "In-class Exercise 2",
+    "section": "DIY",
+    "text": "DIY\n\n\nShow the code\nmpsz2019 <- st_read(\"data/geospatial/MPSZ2019.kml\") %>%\n  st_transform(crs=3414)\n\n\nReading layer `URA_MP19_SUBZONE_NO_SEA_PL' from data source \n  `D:\\KrisLBT\\IS415-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial\\MPSZ2019.kml' \n  using driver `KML'\nSimple feature collection with 332 features and 2 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY, XYZ\nBounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775\nz_range:       zmin: 0 zmax: 0\nGeodetic CRS:  WGS 84\n\n\nNext, I will be trying to merge the dots with the base layer."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy-2",
+    "href": "In-class_Ex/In-class_Ex02/In_class_Ex02.html#diy-2",
+    "title": "In-class Exercise 2",
+    "section": "DIY 2",
+    "text": "DIY 2\n\n\nShow the code\ntm_shape(mpsz2019) +\n  tm_polygons() +\ntm_shape(origin_sf) +\n  tm_dots()"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "This is the course website for IS415 in AY2022/2023 Semester 2 and is where you can find my course work done for this module."
   },
   {
     "objectID": "Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html",
