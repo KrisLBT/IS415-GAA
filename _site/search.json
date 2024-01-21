@@ -551,5 +551,12 @@
     "title": "Hands-on Exercise 3 and 4",
     "section": "Tampines planning area",
     "text": "Tampines planning area\n\nComputing L-function estimate\n\n\nShow the code\nL_tm = Lest(childcare_tm_ppp, correction = \"Ripley\")\nplot(L_tm, . -r ~ r, \n     ylab= \"L(d)-r\", xlab = \"d(m)\", \n     xlim=c(0,1000))\n\n\n\n\n\n\n\nPerforming Complete Spatial Randomness Test\nTo confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:\nHo = The distribution of childcare services at Tampines are randomly distributed.\nH1= The distribution of childcare services at Tampines are not randomly distributed.\nThe null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.\nThe code chunk below will be used to perform the hypothesis testing.\n\n\nShow the code\nL_tm.csr <- envelope(childcare_tm_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)\n\n\nGenerating 99 simulations of CSR  ...\n1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,\n21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,\n41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,\n61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80,\n81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, \n99.\n\nDone.\n\n\n\n\nShow the code\nplot(L_tm.csr, . - r ~ r, \n     xlab=\"d\", ylab=\"L(d)-r\", xlim=c(0,500))"
+  },
+  {
+    "objectID": "Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html",
+    "href": "Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html",
+    "title": "Take Home Exercise 01",
+    "section": "",
+    "text": "In this take-home exercise, I will be finding the geographical and spatio-temporal distribution of Grab hailing service locations in Singapore.\nThe distribution will be analysed using the following, which will be displayed on the openstreetmap of Singapore:\n\nTraditional Kernel Density Estimation (KDE) layers\nNetwork Kernel Density Estimation (NKDE) or Temporal Network Kernel Density Estimation (TNKDE)"
   }
 ]

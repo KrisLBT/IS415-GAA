@@ -1,0 +1,24 @@
+---
+title: "Take Home Exercise 01"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+# Project Overview
+
+In this take-home exercise, I will be finding the geographical and spatio-temporal distribution of Grab hailing service locations in Singapore.
+
+The distribution will be analysed using the following, which will be displayed on the openstreetmap of Singapore:
+
+-   Traditional Kernel Density Estimation (KDE) layers
+
+-   Network Kernel Density Estimation (NKDE) or Temporal Network Kernel Density Estimation (TNKDE)
