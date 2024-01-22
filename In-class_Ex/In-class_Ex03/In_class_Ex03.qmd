@@ -1,0 +1,125 @@
+---
+title: "In-class exercise 3"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  message: False
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+# Revising Hands-on Exercise 3
+
+In this in-class exercise, we will be using the following packages:
+
+-   maptools
+-   sf
+-   spatstat
+-   tmap
+-   tidyverse
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
+```
+
+As there may be issues with installing maptools, you may use the following:
+
+```{r}
+#| eval: False
+install.packages("maptools", repos = "https://packagemanager.posit.co/cran/2023-10-13")
+```
+
+After that, you can rerun the first code block.
+
+# Data import
+
+Import the data using the following:
+
+```{r}
+mpsz_sf <- st_read(dsn='data/geospatial',
+                   layer = 'MP14_SUBZONE_WEB_PL')
+childcare_sf <- st_read("data/geospatial/ChildCareServices.geojson")
+```
+
+We notice that *childcare_sf* is in WGS 84. We can transform it using the following code block.
+
+```{r}
+childcare_sf <- st_transform(childcare_sf, 3414)
+```
+
+## Deriving CoastalOutline
+
+First, we can plot the Master Plan Subzone Boundary 2014
+
+```{r}
+plot(mpsz_sf)
+```
+Then we can blend away the boundaries.
+
+```{r}
+sg_sf <- mpsz_sf %>%
+  st_union()
+```
+
+```{r}
+plot(sg_sf)
+```
+We use *st_union()* over *st_combine()* as *st_union()* will treat the output as a singular polygon while *st_combine()* will treat the individual subzones as their own polygon.
+
+With that, we have made the CoastalOutline
+
+
+
+# Geospatial Data Wrangling
+
+## Creating ppp objects: sf method
+
+We can use the more efficient *as.ppp()* method to convert to ppp.
+
+```{r}
+childcare_ppp <- as.ppp(childcare_sf)
+```
+
+```{r}
+summary(childcare_ppp)
+```
+
+
+# Creating owin object
+```{r}
+sg_owin <- as.owin(sg_sf)
+```
+
+
+```{r}
+plot(sg_owin)
+```
+
+From here on out, the steps are the same.
+
+```{r}
+pg <- mpsz_sf %>%
+  filter(PLN_AREA_N == "PUNGGOL")
+tm <- mpsz_sf %>%
+  filter(PLN_AREA_N == "TAMPINES")
+ck <- mpsz_sf %>%
+  filter(PLN_AREA_N == "CHOA CHU KANG")
+jw <- mpsz_sf %>%
+  filter(PLN_AREA_N == "JURONG WEST")
+```
+
+Plotting
+
+```{r fig.width=16, fig.heights=10}
+par(mfrow=c(2,2))
+plot(pg, main= "Punggol")
+plot(tm, main = "Tampines")
+plot(ck, main = "Choa Chu Kang")
+plot(jw, main= "Jurong West")
+```

@@ -551,5 +551,26 @@
     "title": "Take Home Exercise 01",
     "section": "",
     "text": "In this take-home exercise, I will be finding the geographical and spatio-temporal distribution of Grab hailing service locations in Singapore.\nThe distribution will be analysed using the following, which will be displayed on the openstreetmap of Singapore:\n\nTraditional Kernel Density Estimation (KDE) layers\nNetwork Kernel Density Estimation (NKDE) or Temporal Network Kernel Density Estimation (TNKDE)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex03/In_class_Ex03.html",
+    "href": "In-class_Ex/In-class_Ex03/In_class_Ex03.html",
+    "title": "In-class exercise 3",
+    "section": "",
+    "text": "In this in-class exercise, we will be using the following packages:\n\nmaptools\nsf\nspatstat\ntmap\ntidyverse\n\n\n\nShow the code\npacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)\n\n\nAs there may be issues with installing maptools, you may use the following:\n\n\nShow the code\ninstall.packages(\"maptools\", repos = \"https://packagemanager.posit.co/cran/2023-10-13\")\n\n\nAfter that, you can rerun the first code block."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex03/In_class_Ex03.html#deriving-coastaloutline",
+    "href": "In-class_Ex/In-class_Ex03/In_class_Ex03.html#deriving-coastaloutline",
+    "title": "In-class exercise 3",
+    "section": "Deriving CoastalOutline",
+    "text": "Deriving CoastalOutline\nFirst, we can plot the Master Plan Subzone Boundary 2014\n\n\nShow the code\nplot(mpsz_sf)\n\n\n\n\n\nThen we can blend away the boundaries.\n\n\nShow the code\nsg_sf <- mpsz_sf %>%\n  st_union()\n\n\n\n\nShow the code\nplot(sg_sf)\n\n\n\n\n\nWe use st_union() over st_combine() as st_union() will treat the output as a singular polygon while st_combine() will treat the individual subzones as their own polygon.\nWith that, we have made the CoastalOutline"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex03/In_class_Ex03.html#creating-ppp-objects-sf-method",
+    "href": "In-class_Ex/In-class_Ex03/In_class_Ex03.html#creating-ppp-objects-sf-method",
+    "title": "In-class exercise 3",
+    "section": "Creating ppp objects: sf method",
+    "text": "Creating ppp objects: sf method\nWe can use the more efficient as.ppp() method to convert to ppp.\n\n\nShow the code\nchildcare_ppp <- as.ppp(childcare_sf)\n\n\n\n\nShow the code\nsummary(childcare_ppp)\n\n\nMarked planar point pattern:  1925 points\nAverage intensity 2.417323e-06 points per square unit\n\nCoordinates are given to 3 decimal places\ni.e. rounded to the nearest multiple of 0.001 units\n\nmarks are of type 'character'\nSummary:\n   Length     Class      Mode \n     1925 character character \n\nWindow: rectangle = [11810.03, 45404.24] x [25596.33, 49300.88] units\n                    (33590 x 23700 units)\nWindow area = 796335000 square units"
   }
 ]
