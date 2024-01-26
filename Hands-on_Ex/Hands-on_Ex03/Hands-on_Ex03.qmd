@@ -706,6 +706,7 @@ Conclusion: We reject the null hypothesis
 The G function measures the distribution of the distances from an arbitrary event to its nearest event. In this section, you will learn how to compute G-function estimation by using Gest() of spatstat package. You will also learn how to perform monta carlo simulation test using envelope() of spatstat package.
 
 ## Choa Chu Kang planning area
+
 ### Computing G-function estimation
 
 The code chunk below is used to compute G-function using Gest() of spatat package.
@@ -736,6 +737,7 @@ plot(G_CK.csr)
 ```
 
 ## Tampines planning area
+
 ### Computing G-function estimation
 
 ```{r}
@@ -768,6 +770,7 @@ plot(G_tm.csr)
 The F function estimates the empty space function F(r) or its hazard rate h(r) from a point pattern in a window of arbitrary shape. In this section, you will learn how to compute F-function estimation by using Fest() of spatstat package. You will also learn how to perform monta carlo simulation test using envelope() of spatstat package.
 
 ## Choa Chu Kang planning area
+
 ### Computing F-function estimation
 
 The code chunk below is used to compute F-function using Fest() of spatat package.
@@ -776,6 +779,7 @@ The code chunk below is used to compute F-function using Fest() of spatat packag
 F_CK = Fest(childcare_ck_ppp)
 plot(F_CK)
 ```
+
 ### Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -791,11 +795,13 @@ Monte Carlo test with F-fucntion
 ```{r}
 F_CK.csr <- envelope(childcare_ck_ppp, Fest, nsim = 999)
 ```
+
 ```{r}
 plot(F_CK.csr)
 ```
 
 ## Tampines planning area
+
 ### Computing F-function estimation
 
 Monte Carlo test with F-function
@@ -804,6 +810,7 @@ Monte Carlo test with F-function
 F_tm = Fest(childcare_tm_ppp, correction = "best")
 plot(F_tm)
 ```
+
 ### Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -819,6 +826,7 @@ The code chunk below is used to perform the hypothesis testing.
 ```{r}
 F_tm.csr <- envelope(childcare_tm_ppp, Fest, correction = "all", nsim = 999)
 ```
+
 ```{r}
 plot(F_tm.csr)
 ```
@@ -828,6 +836,7 @@ plot(F_tm.csr)
 K-function measures the number of events found up to a given distance of any particular event. In this section, you will learn how to compute K-function estimates by using Kest() of spatstat package. You will also learn how to perform monta carlo simulation test using envelope() of spatstat package.
 
 ## Choa Chu Kang planning area
+
 ### Computing K-function estimate
 
 ```{r}
@@ -850,11 +859,13 @@ The code chunk below is used to perform the hypothesis testing.
 ```{r}
 K_ck.csr <- envelope(childcare_ck_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
 ```
+
 ```{r}
 plot(K_ck.csr, . - r ~ r, xlab="d", ylab="K(d)-r")
 ```
 
 ## Tampines planning area
+
 ### Computing K-function estimation
 
 ```{r}
@@ -863,6 +874,7 @@ plot(K_tm, . -r ~ r,
      ylab= "K(d)-r", xlab = "d(m)", 
      xlim=c(0,1000))
 ```
+
 ### Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -883,6 +895,7 @@ K_tm.csr <- envelope(childcare_tm_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
 plot(K_tm.csr, . - r ~ r, 
      xlab="d", ylab="K(d)-r", xlim=c(0,500))
 ```
+
 # Analysing Spatial Point Process Using L-Function
 
 In this section, you will learn how to compute L-function estimation by using Lest() of spatstat package. You will also learn how to perform monta carlo simulation test using envelope() of spatstat package.
@@ -910,10 +923,13 @@ The code chunk below is used to perform the hypothesis testing.
 ```{r}
 L_ck.csr <- envelope(childcare_ck_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
 ```
+
 ```{r}
 plot(L_ck.csr, . - r ~ r, xlab="d", ylab="L(d)-r")
 ```
+
 ## Tampines planning area
+
 ### Computing L-function estimate
 
 ```{r}
@@ -938,29 +954,8 @@ The code chunk below will be used to perform the hypothesis testing.
 ```{r}
 L_tm.csr <- envelope(childcare_tm_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
 ```
+
 ```{r}
 plot(L_tm.csr, . - r ~ r, 
      xlab="d", ylab="L(d)-r", xlim=c(0,500))
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

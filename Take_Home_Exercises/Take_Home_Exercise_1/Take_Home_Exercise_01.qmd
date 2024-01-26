@@ -22,3 +22,527 @@ The distribution will be analysed using the following, which will be displayed o
 -   Traditional Kernel Density Estimation (KDE) layers
 
 -   Network Kernel Density Estimation (NKDE) or Temporal Network Kernel Density Estimation (TNKDE)
+
+# Loading the packages
+
+In this section, I will be loading the following packages:
+
+-   maptools
+
+-   sf
+
+-   raster
+
+-   spatstat
+
+-   tmap
+
+-   tidyverse
+
+-   arrow
+
+-   lubridate
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, arrow, lubridate)
+```
+
+# Traditional Kernel Density Estimation
+
+## Extraction of the Coastal Outline of Mainland Singapore
+
+Now, we can use the data for Singapore's outline. The data can be found on [data.gov.sg](data.gov.sg) and is the Master Plan Subzone Boundary 2014.
+
+```{r}
+mpsz_sf <- st_read(dsn = "../../data/data",
+                layer = "MP14_SUBZONE_WEB_PL")
+```
+
+We have to check the CRS to ensure that it is in the correct coordinates system.
+
+```{r}
+#| eval: False
+st_crs(mpsz_sf)
+```
+
+Since it is in the wrong CRS, we have to correct it to SVY21.
+
+```{r}
+#| eval: False
+mpsz_sf <- st_transform(mpsz_sf, 3414)
+```
+
+Now, we can plot the island.
+
+```{r}
+#| eval: False
+plot(mpsz_sf)
+```
+
+We notice that the planning subzone includes areas where Grab does not serve due to lack of bridges. Hence, any roads in unavailable areas would either not be useful or actually distort the network analysis.
+
+Most of the areas unserved by Grab are the outer islands. For this, we can identify which of the outer islands to exclude from our analysis.
+
+```{r}
+#| eval: False
+outer_islands<-  filter(mpsz_sf, grepl('ISLAND', PLN_AREA_N))
+plot(outer_islands["SUBZONE_N"])
+```
+
+However, we realise that not all the islands are unavailable to Grab drivers. Grab drivers are able to pick up and drop off at [Sentosa](https://www.sentosa.gov.sg/files/resources/news/20191121_media_release_sdc_grab_partnership.pdf).
+
+Since 2019, Grab drivers have been allowed entry to [Jurong Island](https://www.grab.com/sg/driver/transport/jurong-island-security-pass-enrolment/), provided they have a security pass. However, given that very few drivers are allowed entry and the fact that this region is generally inaccessible to the public, we will be excluding them.
+
+Hence, the islands we need to exclude are:
+
+-   Semakau
+-   Southern Group
+-   Sudong
+-   North-eastern Islands
+-   Jurong Island and Bukom
+
+```{r}
+#| eval: False
+serviced_area <- mpsz %>%
+  filter(!grepl("SEMAKAU|SOUTHERN GROUP|SUDONG|NORTH-EASTERN ISLANDS|JURONG ISLAND AND BUKOM", SUBZONE_N)) 
+plot(serviced_area)
+```
+
+Now, we can blend away the boundaries.
+
+```{r}
+#| eval: False
+sg_sf <- serviced_area %>%
+  st_union()
+```
+
+Plot the sg_sf and we now see we have the CoastalOutline of Singapore.
+
+```{r}
+#| eval: False
+plot(sg_sf)
+```
+
+We can save it as the CoastalOutline as a shapefile and read it again
+
+```{r}
+#| eval: false
+st_write(sg_sf, 'data/CoastalOutline.shp')
+```
+
+```{r}
+sg_sf <- st_read(dsn='data/',
+                 layer = "CoastalOutline")
+```
+
+
+## Handling of the Grab Posisi data
+
+### Reading the Grab Posisi Data
+
+I will now be loading the Grab Posisi data
+
+```{r}
+#| eval: FALSE
+df <- read_parquet(file="../../data/data/GrabPosisi/part-00000.snappy.parquet")
+df1 <- read_parquet(file="../../data/data/GrabPosisi/part-00001.snappy.parquet")
+df2 <- read_parquet(file="../../data/data/GrabPosisi/part-00002.snappy.parquet")
+df3 <- read_parquet(file="../../data/data/GrabPosisi/part-00003.snappy.parquet")
+df4 <- read_parquet(file="../../data/data/GrabPosisi/part-00004.snappy.parquet")
+df5 <- read_parquet(file="../../data/data/GrabPosisi/part-00005.snappy.parquet")
+df6 <- read_parquet(file="../../data/data/GrabPosisi/part-00006.snappy.parquet")
+df7 <- read_parquet(file="../../data/data/GrabPosisi/part-00007.snappy.parquet")
+df8 <- read_parquet(file="../../data/data/GrabPosisi/part-00008.snappy.parquet")
+df9 <- read_parquet(file="../../data/data/GrabPosisi/part-00009.snappy.parquet")
+```
+
+### Handling the Grab Posisi data
+
+#### Time stamp
+
+There was supposed to be a datetime stamp but it wasn't in that format. As such, the data type needs to be changed.
+
+```{r}
+#| eval: FALSE
+df$pingtimestamp <- as_datetime(df$pingtimestamp)
+df1$pingtimestamp <- as_datetime(df1$pingtimestamp)
+df2$pingtimestamp <- as_datetime(df2$pingtimestamp)
+df3$pingtimestamp <- as_datetime(df3$pingtimestamp)
+df4$pingtimestamp <- as_datetime(df4$pingtimestamp)
+df5$pingtimestamp <- as_datetime(df5$pingtimestamp)
+df6$pingtimestamp <- as_datetime(df6$pingtimestamp)
+df7$pingtimestamp <- as_datetime(df7$pingtimestamp)
+df8$pingtimestamp <- as_datetime(df8$pingtimestamp)
+df9$pingtimestamp <- as_datetime(df9$pingtimestamp)
+```
+
+### Extraction of origin and destination
+
+#### Extraction of origin
+
+Now, I will be extracting the origin.
+
+The way I did it below is by performing the following steps 
+
+-   arrange it according to the trj_id (unique id determining where the person wants to at that point) 
+-   arranging it according to the time stamp (beginning and end) 
+-   getting the first row - mutating the data to weekday, start hour and the day
+
+```{r}
+#| eval: FALSE
+origin_df <- df %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+
+origin_df1 <- df1 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+
+origin_df2 <- df2 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df3 <- df3 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df4 <- df4 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df5 <- df5 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df6 <- df6 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df7 <- df7 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df8 <- df8 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+
+origin_df9 <- df9 %>%
+  group_by(trj_id) %>%
+  arrange(pingtimestamp) %>%
+  filter(row_number()==1) %>%
+  mutate(weekday = wday(pingtimestamp,
+                        label=TRUE,
+                        abbr=TRUE),
+         start_hr= factor(hour(pingtimestamp)),
+         day = factor(mday(pingtimestamp)))
+```
+
+##### Writing of origin data to rds
+
+Now, I will write the origin data to rds for easier future handling.
+
+```{r}
+#| eval: False
+write_rds(origin_df, "data/rds/origin_df.rds")
+write_rds(origin_df1, "data/rds/origin_df1.rds")
+write_rds(origin_df2, "data/rds/origin_df2.rds")
+write_rds(origin_df3, "data/rds/origin_df3.rds")
+write_rds(origin_df4, "data/rds/origin_df4.rds")
+write_rds(origin_df5, "data/rds/origin_df5.rds")
+write_rds(origin_df6, "data/rds/origin_df6.rds")
+write_rds(origin_df7, "data/rds/origin_df7.rds")
+write_rds(origin_df8, "data/rds/origin_df8.rds")
+write_rds(origin_df9, "data/rds/origin_df9.rds")
+```
+
+
+### Reading of RDS data
+
+Now, we can clear the data in our environment and just read the rds data we saved.
+
+#### Reading for origin data
+
+```{r}
+origin_df <- read_rds("data/rds/origin_df.rds")
+origin_df1 <- read_rds("data/rds/origin_df1.rds")
+origin_df2 <- read_rds("data/rds/origin_df2.rds")
+origin_df3 <- read_rds("data/rds/origin_df3.rds")
+origin_df4 <- read_rds("data/rds/origin_df4.rds")
+origin_df5 <- read_rds("data/rds/origin_df5.rds")
+origin_df6 <- read_rds("data/rds/origin_df6.rds")
+origin_df7 <- read_rds("data/rds/origin_df7.rds")
+origin_df8 <- read_rds("data/rds/origin_df8.rds")
+origin_df9 <- read_rds("data/rds/origin_df9.rds")
+```
+
+
+### Merging them into 1 data frame
+#### Merging the origin data frames into 1 origin data frame
+
+For easier handling, we can merge the data frames together.
+
+```{r}
+origin_df_all <- origin_df %>%
+  rbind(origin_df1) %>%
+  rbind(origin_df2) %>%
+  rbind(origin_df3) %>%
+  rbind(origin_df4) %>%
+  rbind(origin_df5) %>%
+  rbind(origin_df6) %>%
+  rbind(origin_df7) %>%
+  rbind(origin_df8) %>%
+  rbind(origin_df9)
+```
+
+
+## Analysis of Origins
+
+### Visualising the Frequency Distribution
+
+```{r}
+ggplot(data=origin_df_all,
+       aes(x=weekday)) +
+  geom_bar()
+```
+As can be seen, the number of trips daily seem to be fairly equally distributed throughout the week.
+
+### Visualising the Origins as a Point Map Symbol
+
+We can visualise the geospatial distribution of the origin points.
+
+```{r}
+origins_sf <- st_as_sf(origin_df_all, coords = c("rawlng", "rawlat"),
+                       crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+Now, we can visualise it using the code chunk below:
+
+```{r}
+tm_shape(mpsz_sf)+
+  tm_polygons()+
+tm_shape(origins_sf) +
+  tm_dots()
+
+```
+
+### Convert sf data frames to sp's Spatial class
+
+We can convert these data to sp's Spatial\* class and then convert into a generic sp format.
+
+```{r}
+sg <- as_Spatial(sg_sf)
+mpsz <- as_Spatial(mpsz_sf)
+origins <- as_Spatial(origins_sf) 
+```
+
+And into SpatialPolygon format
+
+```{r}
+sg_sp <- as(sg, "SpatialPolygons")
+origins_sp <- as(origins, "SpatialPoints")
+```
+
+We then convert it to ppp format.
+
+```{r}
+origins_ppp <- as(origins_sp, "ppp")
+origins_ppp
+```
+Now, I will plot origins_ppp.
+
+```{r}
+plot(origins_ppp)
+```
+We must check for duplicates in the data using the code chunk below:
+
+```{r}
+any(duplicated(origins_ppp))
+```
+We can also find number of duplicates in the data.
+
+```{r}
+multiplicity(origins_ppp)
+```
+To find out number of locations, you can use the code chunk below:
+
+```{r}
+sum(multiplicity(origins_ppp)>1)
+```
+We can jitter it so we can get rid of duplicates without losing valuable data:
+
+```{r}
+origins_ppp_jit <- rjitter(origins_ppp, 
+                             retry=TRUE, 
+                             nsim=1, 
+                             drop=TRUE)
+```
+
+We can now check if there are still any duplicate data:
+
+```{r}
+any((duplicated(origins_ppp_jit)))
+```
+### Create owin data
+Now, we can convert the Coastal Outline to owin data and plot it out.
+
+```{r}
+sg_owin <- as(sg_sp, "owin")
+plot(sg_owin)
+```
+### Combining events
+
+We will now extract Grab origins within the Singapore CoastalOutline
+
+```{r}
+origins_SG_ppp = origins_ppp[sg_owin]
+```
+
+```{r}
+plot(origins_SG_ppp)
+```
+
+```{r}
+kde_origins_SG.bw <- density(origins_SG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+```
+
+
+```{r}
+plot(kde_origins_SG.bw)
+
+```
+```{r}
+bw <- bw.diggle(origins_SG_ppp)
+bw
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(density(origins_SG_ppp, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="gaussian"), 
+     main="Gaussian")
+plot(density(origins_SG_ppp, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="epanechnikov"), 
+     main="Epanechnikov")
+plot(density(origins_SG_ppp, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="quartic"), 
+     main="Quartic")
+plot(density(origins_SG_ppp, 
+             sigma=bw.diggle, 
+             edge=TRUE, 
+             kernel="disc"), 
+     main="Disc")
+
+```
+
+
+# Road Data
+
+Now, we can read the road data as provided by [openstreetmap](https://www.openstreetmap.org/). Note that it provides data for Malaysia, Singapore and Brunei all at once.
+
+```{r}
+#| eval: False
+all_roads <- st_read(dsn='../../data/data/data',
+                     layer = 'gis_osm_roads_free_1')
+```
+
+We realise that it is in WGS 84, not in SVY21 so we have to transform the data.
+
+```{r}
+#| eval: False
+all_roads <- st_transform(all_roads, 3414)
+```
+
+We can check the CRS again for all_roads.
+
+```{r}
+#| eval: False
+st_crs(all_roads)
+```
+
+Since we're only interested in the roads in mainland Singapore, we have to filter the roads.
+
+```{r}
+#| eval: False
+SG_roads <- st_intersection(all_roads, sg_sf)
+```
+
+```{r}
+#| eval: False
+st_write(SG_roads, 'data/SG_roads.shp')
+```
+
+```{r}
+SG_roads_try <- st_read(dsn='data', layer= 'SG_roads')
+```
+
+
+
+
+
+While the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore.

@@ -463,7 +463,6 @@ tm_shape(mpsz_pop2020)+
 
 ```
 
-
 To reset to the default style, refer to the code chunk below:
 
 ```{r}
@@ -480,7 +479,7 @@ In **tmap**, this can be done in 3 ways:
 
 -   by defining a group-by variable in *tm_facets()* and,
 
--   by creating multiple stand-alone maps with *tmap_arrange()* 
+-   by creating multiple stand-alone maps with *tmap_arrange()*
 
 ##### By Assigning Multiple Values to At Least One of the Aesthetic Arguments
 
@@ -496,7 +495,6 @@ tm_shape(mpsz_pop2020)+
   tmap_style("white")
 ```
 
-
 In this example, small multiple choropleth maps are created by assigning multiple values to at least one of the aesthetic arguments
 
 ```{r}
@@ -506,7 +504,6 @@ tm_shape(mpsz_pop2020)+
           palette = list("Blues","Greens")) +
   tm_layout(legend.position = c("right", "bottom"))
 ```
-
 
 ##### By Defining a Group-by Variable in *tm_facets()*
 
@@ -524,7 +521,6 @@ tm_shape(mpsz_pop2020) +
             title.size = 20) +
   tm_borders(alpha = 0.5)
 ```
-
 
 ##### By Creating Multiple Stand-alone Maps with *tmaps_arrange()*
 
@@ -563,20 +559,3 @@ tm_shape(mpsz_pop2020[mpsz_pop2020$REGION_N=="CENTRAL REGION", ])+
             frame = FALSE) +
   tm_borders(alpha = 0.5)
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
