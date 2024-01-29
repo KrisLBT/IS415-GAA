@@ -13,3 +13,133 @@ execute:
   warning: False
 date: "`r Sys.Date()`"
 ---
+
+# Prof tips
+
+-   Remember that the coordinates are in geographic system, not projected
+
+-   Good practice to check the data itself
+
+-   IRL, GIS analysts will have to clean the data and do the joins
+
+-   Read documentation
+
+# Redo of Hands-on Exercise 5
+
+## Loading of packages
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse, knitr)
+```
+
+## Reading of Data
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+## Import csv into R environment
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+## Performing Relational Join
+
+```{r}
+#combines both the hunan and hunan2012 data.frames together
+#subsequently selects certain (2-5, 8 and 16th) columns only
+hunan <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15)
+```
+
+## **Visualising Regional Development Indicator**
+
+Now, we are going to prepare a basemap and a choropleth map showing the distribution of GDPPC 2012 by using *qtm()* of **tmap** package.
+
+```{r}
+basemap <- tm_shape(hunan) +
+  tm_polygons() +
+  tm_text("NAME_3", size=0.5)
+
+gdppc <- qtm(hunan, "GDPPC")
+tmap_arrange(basemap, gdppc, asp=1, ncol=2)
+```
+
+Output is list of polygons
+
+Average: if the average is not a whole number –\> get the rounded value (usually round down)
+
+Round up for distance
+
+Lat long should be true
+
+# Take Home Exercise 1
+
+## Installation of Package
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse, knitr, GWmodel)
+```
+
+## Reading of Data
+
+```{r}
+hunan <- st_read(dsn='data/geospatial'
+                 ,layer='Hunan')
+```
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+## Modifying Data
+
+```{r}
+#combines both the hunan and hunan2012 data.frames together
+#subsequently selects certain (2-5, 8 and 16th) columns only
+#must do early, otherwise will lose GDP data
+hunan <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15)
+```
+
+## Intro to GWModel
+
+GWModel –\> provide a collection of R libraries that let us use distance matrix to conduct summary statistics, multivariate statistics, discriminant analysis, principal components, logistic regression, multiple linear regression, generalised regression, etc.
+
+In this in-class exercise, we will be using GWModel to conduct summary statistics.
+
+### Working with GWSS
+
+::: callout-caution
+## This package cannot accept SF, must be sp object class
+:::
+
+```{r}
+hunan_sp <- hunan %>%
+  as_Spatial()
+```
+
+The adaptive bandwith has to be number of neighbours (bw).
+
+Can take in multiple variables., at the same time (vars)
+
+```{r}
+gwstat <- gwss(data=hunan_sp,
+               vars="GDPPC",
+               bw=6,
+               kernel='bisquare',
+               adaptive=TRUE,
+               longlat=T)
+```
+
+GDPPC_LM is the same as the application of spatial lag (specifically the distance matrix).
+
+mean, standard deviation, variance, skew, coefficience of variations.
+
+```         
+View(gwstat[["SDF"]]@data) --> to view
+```
+
+# Homework: get hands-on exercise results

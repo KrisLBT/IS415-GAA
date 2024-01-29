@@ -103,7 +103,7 @@ Hence, the islands we need to exclude are:
 
 ```{r}
 #| eval: False
-serviced_area <- mpsz %>%
+serviced_area <- mpsz_sf %>%
   filter(!grepl("SEMAKAU|SOUTHERN GROUP|SUDONG|NORTH-EASTERN ISLANDS|JURONG ISLAND AND BUKOM", SUBZONE_N)) 
 plot(serviced_area)
 ```
@@ -134,7 +134,6 @@ st_write(sg_sf, 'data/CoastalOutline.shp')
 sg_sf <- st_read(dsn='data/',
                  layer = "CoastalOutline")
 ```
-
 
 ## Handling of the Grab Posisi data
 
@@ -182,10 +181,10 @@ df9$pingtimestamp <- as_datetime(df9$pingtimestamp)
 
 Now, I will be extracting the origin.
 
-The way I did it below is by performing the following steps 
+The way I did it below is by performing the following steps
 
--   arrange it according to the trj_id (unique id determining where the person wants to at that point) 
--   arranging it according to the time stamp (beginning and end) 
+-   arrange it according to the trj_id (unique id determining where the person wants to at that point)
+-   arranging it according to the time stamp (beginning and end)
 -   getting the first row - mutating the data to weekday, start hour and the day
 
 ```{r}
@@ -311,7 +310,6 @@ write_rds(origin_df8, "data/rds/origin_df8.rds")
 write_rds(origin_df9, "data/rds/origin_df9.rds")
 ```
 
-
 ### Reading of RDS data
 
 Now, we can clear the data in our environment and just read the rds data we saved.
@@ -331,8 +329,8 @@ origin_df8 <- read_rds("data/rds/origin_df8.rds")
 origin_df9 <- read_rds("data/rds/origin_df9.rds")
 ```
 
-
 ### Merging them into 1 data frame
+
 #### Merging the origin data frames into 1 origin data frame
 
 For easier handling, we can merge the data frames together.
@@ -350,7 +348,6 @@ origin_df_all <- origin_df %>%
   rbind(origin_df9)
 ```
 
-
 ## Analysis of Origins
 
 ### Visualising the Frequency Distribution
@@ -360,6 +357,7 @@ ggplot(data=origin_df_all,
        aes(x=weekday)) +
   geom_bar()
 ```
+
 As can be seen, the number of trips daily seem to be fairly equally distributed throughout the week.
 
 ### Visualising the Origins as a Point Map Symbol
@@ -405,26 +403,32 @@ We then convert it to ppp format.
 origins_ppp <- as(origins_sp, "ppp")
 origins_ppp
 ```
+
 Now, I will plot origins_ppp.
 
 ```{r}
 plot(origins_ppp)
 ```
+
 We must check for duplicates in the data using the code chunk below:
 
 ```{r}
 any(duplicated(origins_ppp))
 ```
+
 We can also find number of duplicates in the data.
 
 ```{r}
+#| echo: False
 multiplicity(origins_ppp)
 ```
+
 To find out number of locations, you can use the code chunk below:
 
 ```{r}
 sum(multiplicity(origins_ppp)>1)
 ```
+
 We can jitter it so we can get rid of duplicates without losing valuable data:
 
 ```{r}
@@ -439,13 +443,16 @@ We can now check if there are still any duplicate data:
 ```{r}
 any((duplicated(origins_ppp_jit)))
 ```
+
 ### Create owin data
+
 Now, we can convert the Coastal Outline to owin data and plot it out.
 
 ```{r}
 sg_owin <- as(sg_sp, "owin")
 plot(sg_owin)
 ```
+
 ### Combining events
 
 We will now extract Grab origins within the Singapore CoastalOutline
@@ -465,11 +472,11 @@ kde_origins_SG.bw <- density(origins_SG_ppp,
                             kernel="gaussian") 
 ```
 
-
 ```{r}
 plot(kde_origins_SG.bw)
 
 ```
+
 ```{r}
 bw <- bw.diggle(origins_SG_ppp)
 bw
@@ -499,7 +506,6 @@ plot(density(origins_SG_ppp,
      main="Disc")
 
 ```
-
 
 # Road Data
 
@@ -540,9 +546,5 @@ st_write(SG_roads, 'data/SG_roads.shp')
 ```{r}
 SG_roads_try <- st_read(dsn='data', layer= 'SG_roads')
 ```
-
-
-
-
 
 While the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore.
