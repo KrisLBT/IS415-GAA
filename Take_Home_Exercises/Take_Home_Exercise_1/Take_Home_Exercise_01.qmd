@@ -43,8 +43,14 @@ In this section, I will be loading the following packages:
 
 -   lubridate
 
+-   spNetwork
+
+-   classInt
+
+-   viridis
+
 ```{r}
-pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, arrow, lubridate)
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, arrow, lubridate, spNetwork, classInt)
 ```
 
 # Traditional Kernel Density Estimation
@@ -68,7 +74,6 @@ st_crs(mpsz_sf)
 Since it is in the wrong CRS, we have to correct it to SVY21.
 
 ```{r}
-#| eval: False
 mpsz_sf <- st_transform(mpsz_sf, 3414)
 ```
 
@@ -420,6 +425,7 @@ We can also find number of duplicates in the data.
 
 ```{r}
 #| echo: False
+#| eval: False
 multiplicity(origins_ppp)
 ```
 
@@ -507,7 +513,13 @@ plot(density(origins_SG_ppp,
 
 ```
 
-# Road Data
+# Network Kernel  Density Estimation
+
+While the above does show the distribution of the points and which areas are more concentrated than others, they do not account for the network of the roads. In this section, we will be finding the networks (roads) that are more densely used as origins points in Changi Airport and Marina East.
+
+## Data Handling
+
+### Handling of Road Data
 
 Now, we can read the road data as provided by [openstreetmap](https://www.openstreetmap.org/). Note that it provides data for Malaysia, Singapore and Brunei all at once.
 
@@ -543,8 +555,116 @@ SG_roads <- st_intersection(all_roads, sg_sf)
 st_write(SG_roads, 'data/SG_roads.shp')
 ```
 
+We can now read it from here.
+
 ```{r}
-SG_roads_try <- st_read(dsn='data', layer= 'SG_roads')
+SG_roads <- st_read(dsn='data', layer= 'SG_roads')
 ```
 
-While the above does show the distribution of the origin points, they are not contextualised according to the landscape of Singapore.
+### Handling of Areas
+
+Since we only want to get the areas for planning areas Changi and Marine Parade, we can filter out *mpsz* to get them.
+
+```{r}
+#extraction of Changi Airport
+CA = mpsz_sf[mpsz_sf$PLN_AREA_N=="CHANGI",]
+#extraction of Marine Parade
+MP = mpsz_sf[mpsz_sf$PLN_AREA_N=='MARINE PARADE',]
+```
+
+Now, we can plot them out.
+
+```{r}
+par(mfrow=c(1,2))
+plot(CA["PLN_AREA_N"], main = "Changi")
+plot(MP["PLN_AREA_N"], main= "Marine Parade")
+```
+
+### Getting the Roads within the Subzones
+
+Now, we can find the streets that exist only inside the subzones.
+
+```{r}
+CA_roads <- st_intersection(SG_roads, CA)
+MP_roads <- st_intersection(SG_roads, MP)
+```
+
+```{r}
+CA_roads
+```
+
+We notice that both *CA_roads* and *MP_roads* are geometry type geometry and not a linestring. We can convert them with the following code chunk:
+
+```{r}
+#| warnings: False
+CA_roads <- CA_roads %>%
+  st_cast("LINESTRING")
+
+MP_roads <- MP_roads %>%
+  st_cast("LINESTRING")
+```
+
+### Extraction of the Events Within the Subzones
+
+Before we can conduct analysis on the network, we will also need to constrict the events to exclusively the ones that occurred within these two subzones.
+
+```{r}
+#extraction of origin events that occurred within Changi and Marine Parade
+CA_origins <- st_intersection(origins_sf, CA)
+MP_origins <- st_intersection(origins_sf, MP)
+
+```
+
+We can now plot this data. In this instance:\
+
+```{r}
+tmap_mode('view')
+tm_shape(CA_origins)+
+  tm_dots() +
+  tm_shape(CA_roads) +
+  tm_lines()
+tmap_mode('plot')
+```
+
+## **Network Constrained KDE (NetKDE) Analysis**
+
+### Preparing the lixel objects
+
+We can now prepare the lixel objects.
+
+```{r}
+CA_lixels <- lixelize_lines(CA_roads, 
+                         750, 
+                         mindist = 375)
+MP_lixels <- lixelize_lines(MP_roads, 
+                         750, 
+                         mindist = 375)
+```
+
+### Generating Line Points
+
+```{r}
+CA_samples <- lines_center(CA_lixels)
+MP_samples <- lines_center(MP_lixels)
+```
+
+### Performing NetKDE
+
+```{r}
+CA_densities <- nkde(CA_roads, 
+                  events = CA_origins,
+                  w = rep(1,nrow(CA_origins)),
+                  samples = CA_samples,
+                  kernel_name = "quartic",
+                  bw = 3, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 5, #we aggregate events within a 5m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+# care about bw (bandwith) and kernel_name 
+```
