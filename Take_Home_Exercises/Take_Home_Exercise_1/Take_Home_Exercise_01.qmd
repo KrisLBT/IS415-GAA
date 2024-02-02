@@ -132,10 +132,12 @@ We can save it as the CoastalOutline as a shapefile and read it again
 
 ```{r}
 #| eval: false
+# writing the CoastalOutline
 st_write(sg_sf, 'data/CoastalOutline.shp')
 ```
 
 ```{r}
+# reading the CoastalOutline
 sg_sf <- st_read(dsn='data/',
                  layer = "CoastalOutline")
 ```
@@ -180,6 +182,26 @@ df8$pingtimestamp <- as_datetime(df8$pingtimestamp)
 df9$pingtimestamp <- as_datetime(df9$pingtimestamp)
 ```
 
+### Merging them into 1 data frame
+
+#### Merging the origin data frames into 1 origin data frame
+
+For easier handling, we can merge the data frames together.
+
+```{r}
+#| eval: False
+origin_df_all <- df %>%
+  rbind(df1) %>%
+  rbind(df2) %>%
+  rbind(df3) %>%
+  rbind(df4) %>%
+  rbind(df5) %>%
+  rbind(df6) %>%
+  rbind(df7) %>%
+  rbind(df8) %>%
+  rbind(df9)
+```
+
 ### Extraction of origin and destination
 
 #### Extraction of origin
@@ -194,99 +216,7 @@ The way I did it below is by performing the following steps
 
 ```{r}
 #| eval: FALSE
-origin_df <- df %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-
-origin_df1 <- df1 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-
-origin_df2 <- df2 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df3 <- df3 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df4 <- df4 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df5 <- df5 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df6 <- df6 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df7 <- df7 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df8 <- df8 %>%
-  group_by(trj_id) %>%
-  arrange(pingtimestamp) %>%
-  filter(row_number()==1) %>%
-  mutate(weekday = wday(pingtimestamp,
-                        label=TRUE,
-                        abbr=TRUE),
-         start_hr= factor(hour(pingtimestamp)),
-         day = factor(mday(pingtimestamp)))
-
-origin_df9 <- df9 %>%
+origin_df <- origin_df_all %>%
   group_by(trj_id) %>%
   arrange(pingtimestamp) %>%
   filter(row_number()==1) %>%
@@ -303,16 +233,7 @@ Now, I will write the origin data to rds for easier future handling.
 
 ```{r}
 #| eval: False
-write_rds(origin_df, "data/rds/origin_df.rds")
-write_rds(origin_df1, "data/rds/origin_df1.rds")
-write_rds(origin_df2, "data/rds/origin_df2.rds")
-write_rds(origin_df3, "data/rds/origin_df3.rds")
-write_rds(origin_df4, "data/rds/origin_df4.rds")
-write_rds(origin_df5, "data/rds/origin_df5.rds")
-write_rds(origin_df6, "data/rds/origin_df6.rds")
-write_rds(origin_df7, "data/rds/origin_df7.rds")
-write_rds(origin_df8, "data/rds/origin_df8.rds")
-write_rds(origin_df9, "data/rds/origin_df9.rds")
+write_rds(origin_df, "data/rds/origin_dfs.rds")
 ```
 
 ### Reading of RDS data
@@ -322,35 +243,7 @@ Now, we can clear the data in our environment and just read the rds data we save
 #### Reading for origin data
 
 ```{r}
-origin_df <- read_rds("data/rds/origin_df.rds")
-origin_df1 <- read_rds("data/rds/origin_df1.rds")
-origin_df2 <- read_rds("data/rds/origin_df2.rds")
-origin_df3 <- read_rds("data/rds/origin_df3.rds")
-origin_df4 <- read_rds("data/rds/origin_df4.rds")
-origin_df5 <- read_rds("data/rds/origin_df5.rds")
-origin_df6 <- read_rds("data/rds/origin_df6.rds")
-origin_df7 <- read_rds("data/rds/origin_df7.rds")
-origin_df8 <- read_rds("data/rds/origin_df8.rds")
-origin_df9 <- read_rds("data/rds/origin_df9.rds")
-```
-
-### Merging them into 1 data frame
-
-#### Merging the origin data frames into 1 origin data frame
-
-For easier handling, we can merge the data frames together.
-
-```{r}
-origin_df_all <- origin_df %>%
-  rbind(origin_df1) %>%
-  rbind(origin_df2) %>%
-  rbind(origin_df3) %>%
-  rbind(origin_df4) %>%
-  rbind(origin_df5) %>%
-  rbind(origin_df6) %>%
-  rbind(origin_df7) %>%
-  rbind(origin_df8) %>%
-  rbind(origin_df9)
+origin_df <- read_rds("data/rds/origin_dfs.rds")
 ```
 
 ## Analysis of Origins
@@ -358,7 +251,7 @@ origin_df_all <- origin_df %>%
 ### Visualising the Frequency Distribution
 
 ```{r}
-ggplot(data=origin_df_all,
+ggplot(data=origin_df,
        aes(x=weekday)) +
   geom_bar()
 ```
@@ -370,7 +263,7 @@ As can be seen, the number of trips daily seem to be fairly equally distributed 
 We can visualise the geospatial distribution of the origin points.
 
 ```{r}
-origins_sf <- st_as_sf(origin_df_all, coords = c("rawlng", "rawlat"),
+origins_sf <- st_as_sf(origin_df, coords = c("rawlng", "rawlat"),
                        crs=4326) %>%
   st_transform(crs=3414)
 ```
@@ -412,6 +305,7 @@ origins_ppp
 Now, I will plot origins_ppp.
 
 ```{r}
+#| eval: False
 plot(origins_ppp)
 ```
 
@@ -421,34 +315,7 @@ We must check for duplicates in the data using the code chunk below:
 any(duplicated(origins_ppp))
 ```
 
-We can also find number of duplicates in the data.
-
-```{r}
-#| echo: False
-#| eval: False
-multiplicity(origins_ppp)
-```
-
-To find out number of locations, you can use the code chunk below:
-
-```{r}
-sum(multiplicity(origins_ppp)>1)
-```
-
-We can jitter it so we can get rid of duplicates without losing valuable data:
-
-```{r}
-origins_ppp_jit <- rjitter(origins_ppp, 
-                             retry=TRUE, 
-                             nsim=1, 
-                             drop=TRUE)
-```
-
-We can now check if there are still any duplicate data:
-
-```{r}
-any((duplicated(origins_ppp_jit)))
-```
+As there are no duplicates within the data, we do not have to apply any more transformation to the data.
 
 ### Create owin data
 
@@ -471,22 +338,65 @@ origins_SG_ppp = origins_ppp[sg_owin]
 plot(origins_SG_ppp)
 ```
 
+## Traditional Kernel Analysis
+
+Now we can begin the traditional kernel analysis
+
+### Country level analysis
+
+We can begin by trying to find all of the best kernel and bandwidths for the purposes of our analysis. To do this, we need to find the one with the tightest clusters.
+
+In R, we have 4 possible kernel density bandwidths: diggle, ppl, scott and CvL. All of them will be test below:
+
 ```{r}
 kde_origins_SG.bw <- density(origins_SG_ppp,
                               sigma=bw.diggle,
                               edge=TRUE,
                             kernel="gaussian") 
+kde_origins_SG.ppl <- density(origins_SG_ppp, 
+                               sigma=bw.ppl, 
+                               edge=TRUE,
+                               kernel="gaussian")
+kde_origins_SG.CvL <- density(origins_SG_ppp, 
+                               sigma=bw.CvL, 
+                               edge=TRUE,
+                               kernel="gaussian")
+kde_origins_SG.scott <- density(origins_SG_ppp, 
+                               sigma=bw.scott, 
+                               edge=TRUE,
+                               kernel="gaussian")
 ```
 
+We may also plot them out:
+
 ```{r}
+par(mfrow=c(2,2))
 plot(kde_origins_SG.bw)
-
+plot(kde_origins_SG.ppl)
+plot(kde_origins_SG.CvL)
+plot(kde_origins_SG.scott)
 ```
+
+Now, we can check for the tightness of these clusters:
 
 ```{r}
-bw <- bw.diggle(origins_SG_ppp)
-bw
+# tightness of diggle
+bw.diggle(origins_SG_ppp)
+
+# tightness of ppl
+bw.ppl(origins_SG_ppp)
+
+# tightness of CvL
+bw.CvL(origins_SG_ppp)
+
+# tightness of scott
+bw.scott(origins_SG_ppp)
+
 ```
+
+We can observe that the smallest sigma value is from diggle, suggesting that it has the tightest clusters of all the bandwidth. Hence, we will continue using diggle for this analysis.
+
+We can also test for different kernels:
 
 ```{r}
 par(mfrow=c(2,2))
@@ -513,7 +423,146 @@ plot(density(origins_SG_ppp,
 
 ```
 
-# Network Kernel  Density Estimation
+As they are identical, there is no need to choose a specific one.
+
+### Regions of Interest
+
+We can tighten our analysis to include only areas of interest. From the figures above, we observe higher densities in the planning areas Changi, Jurong East, Woodlands and Marine Parade, we can filter out *mpsz* to get them.
+
+```{r}
+# extraction of Changi Airport
+CA = mpsz_sf[mpsz_sf$PLN_AREA_N=="CHANGI",]
+
+# extraction of Jurong East
+JE = mpsz_sf[mpsz_sf$PLN_AREA_N=="JURONG EAST",]
+
+# extraction of Woodlands
+WL = mpsz_sf[mpsz_sf$PLN_AREA_N=="WOODLANDS",]
+
+# extraction of Marine Parade
+MP = mpsz_sf[mpsz_sf$PLN_AREA_N=='MARINE PARADE',]
+```
+
+With this, we now have to perform the same functions we did in *Create Owin Data*.
+
+```{r}
+# turn them into spatial
+CA_spatial <- as_Spatial(CA)
+JE_spatial <- as_Spatial(JE)
+WL_spatial <- as_Spatial(WL)
+MP_spatial <- as_Spatial(MP)
+
+# turn them into SpatialPolygons
+CA_sp <- as(CA_spatial, "SpatialPolygons")
+JE_sp <- as(JE_spatial, "SpatialPolygons")
+WL_sp <- as(WL_spatial, "SpatialPolygons")
+MP_sp <- as(MP_spatial, "SpatialPolygons")
+
+# convert to owin
+
+CA_owin = as(CA_sp, "owin")
+JE_owin = as(JE_sp, "owin")
+WL_owin = as(WL_sp, "owin")
+MP_owin = as(MP_sp, "owin")
+```
+
+From here, we can extract the events that occurred in these planning areas.
+
+```{r}
+origins_CA_ppp = origins_SG_ppp[CA_owin]
+origins_JE_ppp = origins_SG_ppp[JE_owin]
+origins_WL_ppp = origins_SG_ppp[WL_owin]
+origins_MP_ppp = origins_SG_ppp[MP_owin]
+```
+
+We can now perform the same analysis that we did above:
+
+```{r}
+kde_origins_CA <- density(origins_CA_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+kde_origins_JE <- density(origins_JE_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+kde_origins_WL <- density(origins_WL_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+kde_origins_MP <- density(origins_MP_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+```
+
+We can also plot them out:
+
+```{r}
+par(mfrow=c(2,2))
+plot(kde_origins_CA,
+     main="Changi")
+plot(kde_origins_WL,
+     main="Woodlands")
+plot(kde_origins_JE,
+     main="Jurong East")
+plot(kde_origins_MP,
+     main="Marine Parade")
+```
+
+## Clark and Evans test
+
+### Entire Singapore
+
+```{r}
+clarkevans.test(origins_SG_ppp,
+                correction="none",
+                clipregion="sg_owin",
+                alternative=c("clustered"),
+                nsim=99)
+```
+
+### Changi
+
+```{r}
+clarkevans.test(origins_CA_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+### Woodlands
+
+```{r}
+clarkevans.test(origins_WL_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+### Jurong East
+
+```{r}
+clarkevans.test(origins_JE_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+### Marine Parade
+
+```{r}
+clarkevans.test(origins_MP_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+# Network Kernel Density Estimation
 
 While the above does show the distribution of the points and which areas are more concentrated than others, they do not account for the network of the roads. In this section, we will be finding the networks (roads) that are more densely used as origins points in Changi Airport and Marina East.
 
@@ -561,43 +610,35 @@ We can now read it from here.
 SG_roads <- st_read(dsn='data', layer= 'SG_roads')
 ```
 
-### Handling of Areas
-
-Since we only want to get the areas for planning areas Changi and Marine Parade, we can filter out *mpsz* to get them.
-
-```{r}
-#extraction of Changi Airport
-CA = mpsz_sf[mpsz_sf$PLN_AREA_N=="CHANGI",]
-#extraction of Marine Parade
-MP = mpsz_sf[mpsz_sf$PLN_AREA_N=='MARINE PARADE',]
-```
-
-Now, we can plot them out.
-
-```{r}
-par(mfrow=c(1,2))
-plot(CA["PLN_AREA_N"], main = "Changi")
-plot(MP["PLN_AREA_N"], main= "Marine Parade")
-```
-
 ### Getting the Roads within the Subzones
 
 Now, we can find the streets that exist only inside the subzones.
 
 ```{r}
 CA_roads <- st_intersection(SG_roads, CA)
+WL_roads <- st_intersection(SG_roads, WL)
+JE_roads <- st_intersection(SG_roads, JE)
 MP_roads <- st_intersection(SG_roads, MP)
 ```
 
 ```{r}
 CA_roads
+WL_roads
+JE_roads
+MP_roads
 ```
 
-We notice that both *CA_roads* and *MP_roads* are geometry type geometry and not a linestring. We can convert them with the following code chunk:
+We notice that all of the above are geometry type geometry and not a linestring. We can convert them with the following code chunk:
 
 ```{r}
 #| warnings: False
 CA_roads <- CA_roads %>%
+  st_cast("LINESTRING")
+
+WL_roads <- WL_roads %>%
+  st_cast("LINESTRING")
+
+JE_roads <- JE_roads %>%
   st_cast("LINESTRING")
 
 MP_roads <- MP_roads %>%
@@ -611,11 +652,13 @@ Before we can conduct analysis on the network, we will also need to constrict th
 ```{r}
 #extraction of origin events that occurred within Changi and Marine Parade
 CA_origins <- st_intersection(origins_sf, CA)
+WL_origins <- st_intersection(origins_sf, WL)
+JE_origins <- st_intersection(origins_sf, JE)
 MP_origins <- st_intersection(origins_sf, MP)
 
 ```
 
-We can now plot this data. In this instance:\
+We can now plot this data. In this instance, we can use Changi as an example:
 
 ```{r}
 tmap_mode('view')
@@ -636,6 +679,12 @@ We can now prepare the lixel objects.
 CA_lixels <- lixelize_lines(CA_roads, 
                          750, 
                          mindist = 375)
+WL_lixels <- lixelize_lines(WL_roads, 
+                         750, 
+                         mindist = 375)
+JE_lixels <- lixelize_lines(JE_roads, 
+                         750, 
+                         mindist = 375)
 MP_lixels <- lixelize_lines(MP_roads, 
                          750, 
                          mindist = 375)
@@ -645,6 +694,8 @@ MP_lixels <- lixelize_lines(MP_roads,
 
 ```{r}
 CA_samples <- lines_center(CA_lixels)
+WL_samples <- lines_center(WL_lixels)
+JE_samples <- lines_center(JE_lixels)
 MP_samples <- lines_center(MP_lixels)
 ```
 
@@ -656,14 +707,14 @@ CA_densities <- nkde(CA_roads,
                   w = rep(1,nrow(CA_origins)),
                   samples = CA_samples,
                   kernel_name = "quartic",
-                  bw = 3, 
+                  bw = 3.407207, 
                   div= "bw", 
                   method = "simple", 
                   digits = 1, 
                   tol = 1,
                   grid_shape = c(1,1), 
                   max_depth = 8,
-                  agg = 5, #we aggregate events within a 5m radius (faster calculation)
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
                   sparse = TRUE,
                   verbose = FALSE)
 # care about bw (bandwith) and kernel_name 
