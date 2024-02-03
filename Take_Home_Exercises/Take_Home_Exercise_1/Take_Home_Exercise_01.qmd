@@ -271,6 +271,7 @@ origins_sf <- st_as_sf(origin_df, coords = c("rawlng", "rawlat"),
 Now, we can visualise it using the code chunk below:
 
 ```{r}
+#| eval: False
 tm_shape(mpsz_sf)+
   tm_polygons()+
 tm_shape(origins_sf) +
@@ -349,6 +350,7 @@ We can begin by trying to find all of the best kernel and bandwidths for the pur
 In R, we have 4 possible kernel density bandwidths: diggle, ppl, scott and CvL. All of them will be test below:
 
 ```{r}
+#| eval: False
 kde_origins_SG.bw <- density(origins_SG_ppp,
                               sigma=bw.diggle,
                               edge=TRUE,
@@ -370,6 +372,7 @@ kde_origins_SG.scott <- density(origins_SG_ppp,
 We may also plot them out:
 
 ```{r}
+#| eval: False
 par(mfrow=c(2,2))
 plot(kde_origins_SG.bw)
 plot(kde_origins_SG.ppl)
@@ -380,6 +383,7 @@ plot(kde_origins_SG.scott)
 Now, we can check for the tightness of these clusters:
 
 ```{r}
+#| eval: False
 # tightness of diggle
 bw.diggle(origins_SG_ppp)
 
