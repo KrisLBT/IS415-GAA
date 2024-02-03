@@ -15,13 +15,27 @@ date: "`r Sys.Date()`"
 
 # Project Overview
 
+It is important for local and government urban planners to know and understand how, where and when people move. For Singapore, data regarding human mobility has largely been collected and disseminated by the Land Transport Authority (LTA). However, they have only collected and publicised data regarding passenger volume from trains stations and bus stops. While immensely helpful, it still leaves out crucial information about human mobility through other means of transport, making it incomphrensive.
+
+In 2020, Grab released Grab Posisi, a data set regarding the origin and destinations of Grab taxi users in Singapore.
+
 In this take-home exercise, I will be finding the geographical and spatio-temporal distribution of Grab hailing service locations in Singapore.
 
 The distribution will be analysed using the following, which will be displayed on the openstreetmap of Singapore:
 
--   Traditional Kernel Density Estimation (KDE) layers
+-   Traditional Kernel Density Estimation (KDE) layers: to analyse the where origin points tend to cluster
 
--   Network Kernel Density Estimation (NKDE) or Temporal Network Kernel Density Estimation (TNKDE)
+-   Network Kernel Density Estimation (NKDE): to analyse the clusters of origin points, as constrained by the road.
+
+# The Data
+
+| Name                 | Description                                                | Format   | Source                                                                                   |
+|-------------|------------------|-------------|-----------------------------|
+| MP14_SUBZONE_WEB_PL  | Subzone Boundary of Singapore (2014)                       | .shp     | [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view) |
+| Grab Posisi          | Dataframe of Origin and Destination Locations through Grab | .parquet | Provided by professor                                                                    |
+| gis_osm_roads_free_1 | Road network of Malaysia, Singapore and Brunei             | .shp     | [geofabrik.de](https://download.geofabrik.de/asia/malaysia-singapore-brunei.html)        |
+
+: Data Sets Used
 
 # Loading the packages
 
@@ -53,11 +67,13 @@ In this section, I will be loading the following packages:
 pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, arrow, lubridate, spNetwork, classInt)
 ```
 
-# Traditional Kernel Density Estimation
+# General Handling
 
 ## Extraction of the Coastal Outline of Mainland Singapore
 
-Now, we can use the data for Singapore's outline. The data can be found on [data.gov.sg](data.gov.sg) and is the Master Plan Subzone Boundary 2014.
+For the purposes of this analysis, we will also need to extract the Coastal Outline of Singapore. This is to create a boundary for all the points to fall under.
+
+First, we need to read Singapore Master Plan Subzone 2014 to get Singapore's shape overall.
 
 ```{r}
 mpsz_sf <- st_read(dsn = "../../data/data",
@@ -71,7 +87,7 @@ We have to check the CRS to ensure that it is in the correct coordinates system.
 st_crs(mpsz_sf)
 ```
 
-Since it is in the wrong CRS, we have to correct it to SVY21.
+Since it is in the wrong CRS (WGS84), we have to correct it to SVY21.
 
 ```{r}
 mpsz_sf <- st_transform(mpsz_sf, 3414)
@@ -121,7 +137,7 @@ sg_sf <- serviced_area %>%
   st_union()
 ```
 
-Plot the sg_sf and we now see we have the CoastalOutline of Singapore.
+Plot the sg_sf and we now see we have the CoastalOutline of Singapore that is served by Grab.
 
 ```{r}
 #| eval: False
@@ -143,6 +159,10 @@ sg_sf <- st_read(dsn='data/',
 ```
 
 ## Handling of the Grab Posisi data
+
+We will also have to handle the Grab Posisi data.
+
+The data is quite large. As such, Grab has divided into 10 parquet files for easier distribution.
 
 ### Reading the Grab Posisi Data
 
@@ -166,7 +186,7 @@ df9 <- read_parquet(file="../../data/data/GrabPosisi/part-00009.snappy.parquet")
 
 #### Time stamp
 
-There was supposed to be a datetime stamp but it wasn't in that format. As such, the data type needs to be changed.
+Upon investigating the file, I noticed that there was supposed to be a datetime stamp but it wasn't in that format. As such, the data type needs to be changed.
 
 ```{r}
 #| eval: FALSE
@@ -182,11 +202,9 @@ df8$pingtimestamp <- as_datetime(df8$pingtimestamp)
 df9$pingtimestamp <- as_datetime(df9$pingtimestamp)
 ```
 
-### Merging them into 1 data frame
+#### Merging them into 1 data frame
 
-#### Merging the origin data frames into 1 origin data frame
-
-For easier handling, we can merge the data frames together.
+I also noticed that the the same ride might actually have origin and destination points through multiple data frames. As such, we need to merge them before we can extract the origin points.
 
 ```{r}
 #| eval: False
@@ -202,9 +220,7 @@ origin_df_all <- df %>%
   rbind(df9)
 ```
 
-### Extraction of origin and destination
-
-#### Extraction of origin
+#### Extraction of Origin
 
 Now, I will be extracting the origin.
 
@@ -227,7 +243,7 @@ origin_df <- origin_df_all %>%
          day = factor(mday(pingtimestamp)))
 ```
 
-##### Writing of origin data to rds
+##### Writing of Origin Data to RDS
 
 Now, I will write the origin data to rds for easier future handling.
 
@@ -236,19 +252,21 @@ Now, I will write the origin data to rds for easier future handling.
 write_rds(origin_df, "data/rds/origin_dfs.rds")
 ```
 
-### Reading of RDS data
+##### Reading of RDS data
 
 Now, we can clear the data in our environment and just read the rds data we saved.
-
-#### Reading for origin data
 
 ```{r}
 origin_df <- read_rds("data/rds/origin_dfs.rds")
 ```
 
-## Analysis of Origins
+## Exploratory Data Analysis and Handling of Origins
+
+In this section, I will be exploring the general distribution of the origin points and handling it for the subsequent sections, which will analyse the data in greater detail.
 
 ### Visualising the Frequency Distribution
+
+First, I will plot out the general distribution of the origin points
 
 ```{r}
 ggplot(data=origin_df,
@@ -260,7 +278,7 @@ As can be seen, the number of trips daily seem to be fairly equally distributed 
 
 ### Visualising the Origins as a Point Map Symbol
 
-We can visualise the geospatial distribution of the origin points.
+We can visualise the geospatial distribution of the origin points. First, we need to convert the coordinates to lat-long and transform it to the correct CRS.
 
 ```{r}
 origins_sf <- st_as_sf(origin_df, coords = c("rawlng", "rawlat"),
@@ -279,26 +297,21 @@ tm_shape(origins_sf) +
 
 ```
 
-### Convert sf data frames to sp's Spatial class
+### Handling
 
-We can convert these data to sp's Spatial\* class and then convert into a generic sp format.
+For further analysis, we will need to convert the various data into different formats. These will be explained and performed in the code chunk below
 
 ```{r}
+#conversion of sg_sf, mpsz_sf and origins_sf to a generic spatial class
 sg <- as_Spatial(sg_sf)
 mpsz <- as_Spatial(mpsz_sf)
 origins <- as_Spatial(origins_sf) 
-```
 
-And into SpatialPolygon format
-
-```{r}
+# Conversion of sg and origins to SpatialPolygon format
 sg_sp <- as(sg, "SpatialPolygons")
 origins_sp <- as(origins, "SpatialPoints")
-```
 
-We then convert it to ppp format.
-
-```{r}
+# conversion of origins to ppp format
 origins_ppp <- as(origins_sp, "ppp")
 origins_ppp
 ```
@@ -318,7 +331,7 @@ any(duplicated(origins_ppp))
 
 As there are no duplicates within the data, we do not have to apply any more transformation to the data.
 
-### Create owin data
+#### Create Owin Data
 
 Now, we can convert the Coastal Outline to owin data and plot it out.
 
@@ -327,42 +340,46 @@ sg_owin <- as(sg_sp, "owin")
 plot(sg_owin)
 ```
 
-### Combining events
+#### Combining Events
 
 We will now extract Grab origins within the Singapore CoastalOutline
 
 ```{r}
 origins_SG_ppp = origins_ppp[sg_owin]
-```
 
-```{r}
+# plotting the distribution of the origins
 plot(origins_SG_ppp)
 ```
 
-## Traditional Kernel Analysis
+# Traditional Kernel Density Estimation Analysis
 
-Now we can begin the traditional kernel analysis
+Now we can begin the traditional kernel density estimation analysis. As mentioned in *Project Overview*, this analysis will enable us to find areas where there is a greater density of origin points. As such, we can find where Grab users tend to book their Grab trips.
 
-### Country level analysis
+## Country Level Analysis
 
 We can begin by trying to find all of the best kernel and bandwidths for the purposes of our analysis. To do this, we need to find the one with the tightest clusters.
 
-In R, we have 4 possible kernel density bandwidths: diggle, ppl, scott and CvL. All of them will be test below:
+In R, we have 4 possible kernel density bandwidths: diggle, ppl, scott and CvL. All of them will be tested below:
 
 ```{r}
 #| eval: False
+
+# diggle
 kde_origins_SG.bw <- density(origins_SG_ppp,
                               sigma=bw.diggle,
                               edge=TRUE,
                             kernel="gaussian") 
+# ppl
 kde_origins_SG.ppl <- density(origins_SG_ppp, 
                                sigma=bw.ppl, 
                                edge=TRUE,
                                kernel="gaussian")
+# CvL
 kde_origins_SG.CvL <- density(origins_SG_ppp, 
                                sigma=bw.CvL, 
                                edge=TRUE,
                                kernel="gaussian")
+# scott
 kde_origins_SG.scott <- density(origins_SG_ppp, 
                                sigma=bw.scott, 
                                edge=TRUE,
@@ -427,9 +444,9 @@ plot(density(origins_SG_ppp,
 
 ```
 
-As they are identical, there is no need to choose a specific one.
+As they are identical, there is no need to choose a specific one. Moving forward, I will be using Gaussian kernel.
 
-### Regions of Interest
+## Regions of Interest
 
 We can tighten our analysis to include only areas of interest. From the figures above, we observe higher densities in the planning areas Changi, Jurong East, Woodlands and Marine Parade, we can filter out *mpsz* to get them.
 
@@ -447,7 +464,7 @@ WL = mpsz_sf[mpsz_sf$PLN_AREA_N=="WOODLANDS",]
 MP = mpsz_sf[mpsz_sf$PLN_AREA_N=='MARINE PARADE',]
 ```
 
-With this, we now have to perform the same functions we did in *Create Owin Data*.
+With this, we now have to perform the same functions we did in *Create Owin Data* and *Conversions*.
 
 ```{r}
 # turn them into spatial
@@ -479,7 +496,7 @@ origins_WL_ppp = origins_SG_ppp[WL_owin]
 origins_MP_ppp = origins_SG_ppp[MP_owin]
 ```
 
-We can now perform the same analysis that we did above:
+We can now perform the same analysis that we did in *Country Level Analysis*:
 
 ```{r}
 kde_origins_CA <- density(origins_CA_ppp,
@@ -516,7 +533,15 @@ plot(kde_origins_MP,
 
 ## Clark and Evans test
 
-### Entire Singapore
+The Clark and Evans test allows us to understand if the data points are clustered in any places or not.
+
+### Country Level Analysis
+
+In the below code chunk, we are conducting this test on the origin points in the whole of Singapore. The hypothesis are as follows
+
+H0: The Grab origin points are distributed equally throughout the country
+
+H1: The Grab origin points have clusters.
 
 ```{r}
 clarkevans.test(origins_SG_ppp,
@@ -526,7 +551,11 @@ clarkevans.test(origins_SG_ppp,
                 nsim=99)
 ```
 
-### Changi
+From this, we can see that there is clustering (R=0.28039) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+### Regions of Interest
+
+#### Changi
 
 ```{r}
 clarkevans.test(origins_CA_ppp,
@@ -536,7 +565,9 @@ clarkevans.test(origins_CA_ppp,
                 nsim=99)
 ```
 
-### Woodlands
+From this, we can see that there is clustering (R= 0.31778) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+#### Woodlands
 
 ```{r}
 clarkevans.test(origins_WL_ppp,
@@ -546,7 +577,9 @@ clarkevans.test(origins_WL_ppp,
                 nsim=99)
 ```
 
-### Jurong East
+From this, we can see that there is clustering (R= 0.25797) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+#### Jurong East
 
 ```{r}
 clarkevans.test(origins_JE_ppp,
@@ -556,7 +589,9 @@ clarkevans.test(origins_JE_ppp,
                 nsim=99)
 ```
 
-### Marine Parade
+From this, we can see that there is clustering (R= 0.25797) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+#### Marine Parade
 
 ```{r}
 clarkevans.test(origins_MP_ppp,
@@ -565,6 +600,8 @@ clarkevans.test(origins_MP_ppp,
                 alternative=c("two.sided"),
                 nsim=99)
 ```
+
+From this, we can see that there is clustering (R= 0.51201) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
 
 # Network Kernel Density Estimation
 
@@ -600,11 +637,10 @@ Since we're only interested in the roads in mainland Singapore, we have to filte
 
 ```{r}
 #| eval: False
+# get all roads in mainland Singapore
 SG_roads <- st_intersection(all_roads, sg_sf)
-```
 
-```{r}
-#| eval: False
+# write out the roads into a separate .shp file for easier future handling
 st_write(SG_roads, 'data/SG_roads.shp')
 ```
 
@@ -619,6 +655,8 @@ SG_roads <- st_read(dsn='data', layer= 'SG_roads')
 Now, we can find the streets that exist only inside the subzones.
 
 ```{r}
+#| warnings: False
+# get roads only in the aforementioned subzones
 CA_roads <- st_intersection(SG_roads, CA)
 WL_roads <- st_intersection(SG_roads, WL)
 JE_roads <- st_intersection(SG_roads, JE)
@@ -654,6 +692,7 @@ MP_roads <- MP_roads %>%
 Before we can conduct analysis on the network, we will also need to constrict the events to exclusively the ones that occurred within these two subzones.
 
 ```{r}
+#| warnings: False
 #extraction of origin events that occurred within Changi and Marine Parade
 CA_origins <- st_intersection(origins_sf, CA)
 WL_origins <- st_intersection(origins_sf, WL)
@@ -677,7 +716,7 @@ tmap_mode('plot')
 
 ### Preparing the lixel objects
 
-We can now prepare the lixel objects.
+Before computing NetKDE, the SpatialLines object need to be cut into lixels with a specified minimal distance. This task can be performed by using with *lixelize_lines()* of spNetwork as shown in the code chunk below.
 
 ```{r}
 CA_lixels <- lixelize_lines(CA_roads, 
@@ -696,6 +735,8 @@ MP_lixels <- lixelize_lines(MP_roads,
 
 ### Generating Line Points
 
+Next, *lines_center()* of **spNetwork** will be used to generate a SpatialPointsDataFrame (i.e. samples) with line centre points as shown in the code chunk below.
+
 ```{r}
 CA_samples <- lines_center(CA_lixels)
 WL_samples <- lines_center(WL_lixels)
@@ -705,13 +746,15 @@ MP_samples <- lines_center(MP_lixels)
 
 ### Performing NetKDE
 
+We can now compute the NetKDE using the code chunk below
+
 ```{r}
 CA_densities <- nkde(CA_roads, 
                   events = CA_origins,
                   w = rep(1,nrow(CA_origins)),
                   samples = CA_samples,
                   kernel_name = "quartic",
-                  bw = 3.407207, 
+                  bw = 8.080901, 
                   div= "bw", 
                   method = "simple", 
                   digits = 1, 
@@ -722,4 +765,87 @@ CA_densities <- nkde(CA_roads,
                   sparse = TRUE,
                   verbose = FALSE)
 # care about bw (bandwith) and kernel_name 
+
+JE_densities <- nkde(JE_roads, 
+                  events = JE_origins,
+                  w = rep(1,nrow(JE_origins)),
+                  samples = JE_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+ # care about bw (bandwith) and kernel_name 
+
+WL_densities <- nkde(WL_roads, 
+                  events = WL_origins,
+                  w = rep(1,nrow(WL_origins)),
+                  samples = WL_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+# care about bw (bandwith) and kernel_name 
+
+MP_densities <- nkde(MP_roads, 
+                  events = MP_origins,
+                  w = rep(1,nrow(MP_origins)),
+                  samples = MP_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+# care about bw (bandwith) and kernel_name 
+```
+
+### Visualising NetKDE
+
+Before we can visualise the NetKDE values, code chunk below will be used to insert the computed density values (i.e. densities) into *samples* and *lixels* objects as *density* field.
+
+```{r}
+CA_samples$density <- CA_densities
+CA_lixels$density <- CA_densities
+
+JE_samples$density <- JE_densities
+JE_lixels$density <- JE_densities
+
+MP_samples$density <- MP_densities
+MP_lixels$density <- MP_densities
+
+WL_samples$density <- WL_densities
+WL_lixels$density <- WL_densities
+```
+
+We can also rescale to make the values more understandable. Since the values are in kilometres, multiplying the values by 1000 will convert them to metres.
+
+We can use the code chunk below to visualise the network kernel density estimation (using Changi as an example):
+
+```{r}
+tmap_mode('view')
+tm_shape(CA_lixels)+
+  tm_lines(col="density")+
+tm_shape(CA_origins)+
+  tm_dots()
+
+tmap_mode('plot')
 ```
