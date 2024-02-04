@@ -30,7 +30,7 @@ The distribution will be analysed using the following, which will be displayed o
 # The Data
 
 | Name                 | Description                                                | Format   | Source                                                                                   |
-|-------------|------------------|-------------|-----------------------------|
+|----------------|----------------|----------------|--------------------------|
 | MP14_SUBZONE_WEB_PL  | Subzone Boundary of Singapore (2014)                       | .shp     | [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view) |
 | Grab Posisi          | Dataframe of Origin and Destination Locations through Grab | .parquet | Provided by professor                                                                    |
 | gis_osm_roads_free_1 | Road network of Malaysia, Singapore and Brunei             | .shp     | [geofabrik.de](https://download.geofabrik.de/asia/malaysia-singapore-brunei.html)        |
@@ -150,8 +150,8 @@ We can save it as the CoastalOutline as a shapefile and read it again
 #| eval: false
 # writing the CoastalOutline
 st_write(sg_sf, 'data/CoastalOutline.shp')
-```
 
+```
 ```{r}
 # reading the CoastalOutline
 sg_sf <- st_read(dsn='data/',
@@ -615,6 +615,7 @@ Now, we can read the road data as provided by [openstreetmap](https://www.openst
 
 ```{r}
 #| eval: False
+#| warnings: False
 all_roads <- st_read(dsn='../../data/data/data',
                      layer = 'gis_osm_roads_free_1')
 ```
@@ -746,9 +747,10 @@ MP_samples <- lines_center(MP_lixels)
 
 ### Performing NetKDE
 
-We can now compute the NetKDE using the code chunk below
+We can now compute the NetKDE using the code chunk below:
 
 ```{r}
+# for the purposes of this analysis, the bandwidth will be set to 8.080901, which is the diggle bandwidth for Singapore overall
 CA_densities <- nkde(CA_roads, 
                   events = CA_origins,
                   w = rep(1,nrow(CA_origins)),
@@ -838,14 +840,50 @@ WL_lixels$density <- WL_densities
 
 We can also rescale to make the values more understandable. Since the values are in kilometres, multiplying the values by 1000 will convert them to metres.
 
-We can use the code chunk below to visualise the network kernel density estimation (using Changi as an example):
+We can use the code chunk below to visualise the network kernel density estimation:
+
+#### Visualising NetKDE for Changi
 
 ```{r}
 tmap_mode('view')
 tm_shape(CA_lixels)+
-  tm_lines(col="density")+
-tm_shape(CA_origins)+
-  tm_dots()
+  tm_lines(col="density")
 
 tmap_mode('plot')
 ```
+
+#### Visualising NetKDE for Jurong East
+
+```{r}
+tmap_mode('view')
+tm_shape(JE_lixels)+
+  tm_lines(col="density")
+
+tmap_mode('plot')
+```
+
+#### Visualising NetKDE for Marine Parade
+
+```{r}
+tmap_mode('view')
+tm_shape(MP_lixels)+
+  tm_lines(col="density")
+
+tmap_mode('plot')
+```
+
+#### Visualising NetKDE for Woodlands
+
+```{r}
+tmap_mode('view')
+tm_shape(WL_lixels)+
+  tm_lines(col="density")
+
+tmap_mode('plot')
+```
+
+# Conclusion
+
+From the above, we can conclude that there is visible clustering where people book Grab rides in Singapore. This could be attributed to the public transportation system being comprehensive and comparatively inexpensive, which disinclines commuters from opting for Grab taxis. Nonetheless, this analysis is inconclusive as it's only the total number of rides for a period of a few. Hence, it may not be representative of population behaviour over time.
+
+
