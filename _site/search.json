@@ -768,5 +768,68 @@
     "title": "Take Home Exercise 01",
     "section": "Regions of Interest",
     "text": "Regions of Interest\nWe can tighten our analysis to include only areas of interest. From the figures above, we observe higher densities in the planning areas Changi, Jurong East, Woodlands and Marine Parade, we can filter out mpsz to get them.\n\n\nShow the code\n# extraction of Changi Airport\nCA = mpsz_sf[mpsz_sf$PLN_AREA_N==\"CHANGI\",]\n\n# extraction of Jurong East\nJE = mpsz_sf[mpsz_sf$PLN_AREA_N==\"JURONG EAST\",]\n\n# extraction of Woodlands\nWL = mpsz_sf[mpsz_sf$PLN_AREA_N==\"WOODLANDS\",]\n\n# extraction of Marine Parade\nMP = mpsz_sf[mpsz_sf$PLN_AREA_N=='MARINE PARADE',]\n\n\nWith this, we now have to perform the same functions we did in Create Owin Data and Conversions.\n\n\nShow the code\n# turn them into spatial\nCA_spatial <- as_Spatial(CA)\nJE_spatial <- as_Spatial(JE)\nWL_spatial <- as_Spatial(WL)\nMP_spatial <- as_Spatial(MP)\n\n# turn them into SpatialPolygons\nCA_sp <- as(CA_spatial, \"SpatialPolygons\")\nJE_sp <- as(JE_spatial, \"SpatialPolygons\")\nWL_sp <- as(WL_spatial, \"SpatialPolygons\")\nMP_sp <- as(MP_spatial, \"SpatialPolygons\")\n\n# convert to owin\n\nCA_owin = as(CA_sp, \"owin\")\nJE_owin = as(JE_sp, \"owin\")\nWL_owin = as(WL_sp, \"owin\")\nMP_owin = as(MP_sp, \"owin\")\n\n\nFrom here, we can extract the events that occurred in these planning areas.\n\n\nShow the code\norigins_CA_ppp = origins_SG_ppp[CA_owin]\norigins_JE_ppp = origins_SG_ppp[JE_owin]\norigins_WL_ppp = origins_SG_ppp[WL_owin]\norigins_MP_ppp = origins_SG_ppp[MP_owin]\n\n\nWe can now perform the same analysis that we did in Country Level Analysis:\n\n\nShow the code\nkde_origins_CA <- density(origins_CA_ppp,\n                              sigma=bw.diggle,\n                              edge=TRUE,\n                            kernel=\"gaussian\") \nkde_origins_JE <- density(origins_JE_ppp,\n                              sigma=bw.diggle,\n                              edge=TRUE,\n                            kernel=\"gaussian\") \nkde_origins_WL <- density(origins_WL_ppp,\n                              sigma=bw.diggle,\n                              edge=TRUE,\n                            kernel=\"gaussian\") \nkde_origins_MP <- density(origins_MP_ppp,\n                              sigma=bw.diggle,\n                              edge=TRUE,\n                            kernel=\"gaussian\") \n\n\nWe can also plot them out:\n\n\nShow the code\npar(mfrow=c(2,2))\nplot(kde_origins_CA,\n     main=\"Changi\")\nplot(kde_origins_WL,\n     main=\"Woodlands\")\nplot(kde_origins_JE,\n     main=\"Jurong East\")\nplot(kde_origins_MP,\n     main=\"Marine Parade\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "",
+    "text": "For this in-class exercise, we will be using the following packages and loading it into our R environment:\n\nsf\ntmap\nsfdep\n\nthe newer version of spdep;\ncan use immediately with sf objects; will save to sf layer) – old version had to extract it out\n\ntidyverse\n\n\n\nShow the code\npacman::p_load(sf, tmap, sfdep, tidyverse)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#importing-geospatial-data",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#importing-geospatial-data",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Importing Geospatial Data",
+    "text": "Importing Geospatial Data\nFirst, I will be importing Hunan.\n\n\nShow the code\nHunan <- st_read(dsn=\"data/geospatial\",\n                 layer = \"Hunan\") \n\n\nReading layer `Hunan' from data source \n  `D:\\KrisLBT\\IS415-GAA\\In-class_Ex\\In-class_Ex05\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\n\n\n\n\n\n\n\n\nNote\n\n\n\nCheck if the bounding box is in decimal deree or not. If it’s in decimal degree, it is in geodetic CRS, not projected CRS."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#importing-aspatial-data",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#importing-aspatial-data",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Importing Aspatial Data",
+    "text": "Importing Aspatial Data\nNow, I will be importing Hunan_2012.csv into my R environment\n\n\nShow the code\nHunan_2012 = read_csv(\"data/aspatial/Hunan_2012.csv\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#joining-the-data",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#joining-the-data",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Joining the Data",
+    "text": "Joining the Data\n\n\nShow the code\n# will lose geometry for sf layer\nhunan_GDPPC <- left_join(Hunan, Hunan_2012) %>%\n  select(1:4, 7, 15)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#notes",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#notes",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Notes",
+    "text": "Notes\nCheck if anything can be used to join the data frames (geospatial and aspatial). This can be County name etc.\nAlso, perform left_join to prevent losing the geometric data"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#note-1",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#note-1",
+    "title": "In-class Exercise 05",
+    "section": "Note",
+    "text": "Note\n.before = 1 means to ensure one column will always be the first May not be necessaryin real life applications"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#computing-global-moran-i",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#computing-global-moran-i",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Computing Global Moran I",
+    "text": "Computing Global Moran I\n\n\nShow the code\nmoranI <- global_moran(wm_q$GDPPC,\n                      wm_q$nb,\n                      wm_q$wt)\nglimpse(moranI)\n\n\nList of 2\n $ I: num 0.301\n $ K: num 7.64\n\n\nHowever, Global Moran I might not be convincing enough"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#queenss-method",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#queenss-method",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Queens’s Method",
+    "text": "Queens’s Method\nYou can go directly into the Queen’s Method using tidyverse in a singular step:\n\n\nShow the code\nwm_q <- hunan_GDPPC %>%\n  mutate(nb=st_contiguity(geometry),\n         wt= st_weights(nb,\n                        style = \"W\"),\n         .before =1)\n\n\n\nNote\n.before = 1 means to ensure one column will always be the first May not be necessary in real life applications"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#performing-global-moran-i-permutation-test",
+    "href": "In-class_Ex/In-class_Ex05/In_class_Ex05.html#performing-global-moran-i-permutation-test",
+    "title": "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method",
+    "section": "Performing Global Moran I permutation test",
+    "text": "Performing Global Moran I permutation test\nCan do it on multiple simulations (in this case 100. This is because the number of simulations is nsim+1) to confirm the representativeness of the data set.\n\n\nShow the code\nglobal_moran_perm(wm_q$GDPPC,\n                  wm_q$nb,\n                  wm_q$wt,\n                  nsim = 99)\n\n\n\n    Monte-Carlo simulation of Moran I\n\ndata:  x \nweights: listw  \nnumber of simulations + 1: 100 \n\nstatistic = 0.30075, observed rank = 100, p-value < 2.2e-16\nalternative hypothesis: two.sided\n\n\nThe statistical report above demonstrates that the p-value is smaller than 0.05, which means that this result is significant at a 95% significance level. Hence, we can reject the null hypothesis that the spatial distribution of GDP per capita resembles random distribution. Because the Moran’s I value is greater than 0, we can infer that the spatial distribution shows signs of clustering.\n\nNote\nnsim will effect computation time. If you’re on a larger data set, you can just do a smaller number (e.g. 99, 49). 999 may take an incredibly long time to load. Test if your compute can handle it within a certain timeframe.\nWe can also only infer from the results, we can’t definitively prove/disprove our hypothesis\n\nComplete in-class exercise 5 on our own + watch video for hot and cold spot"
   }
 ]

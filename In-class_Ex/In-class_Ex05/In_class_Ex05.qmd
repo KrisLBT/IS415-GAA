@@ -1,5 +1,5 @@
 ---
-title: "In-class Exercise 05"
+title: "In-class Exercise 05 - Global and Local Measures of Spatial Association: sfdep method"
 format:
   html:
     code-fold: True
@@ -12,3 +12,146 @@ execute:
   warning: False
 date: "`r Sys.Date()`"
 ---
+
+# Installation of Packages
+
+For this in-class exercise, we will be using the following packages and loading it into our R environment:
+
+-   sf
+-   tmap
+-   sfdep
+    -   the newer version of spdep;
+    -   can use immediately with sf objects; will save to sf layer) -- old version had to extract it out
+-   tidyverse
+
+```{r}
+pacman::p_load(sf, tmap, sfdep, tidyverse)
+```
+
+# Loading the Data
+
+For the purpose of our analysis, we will be using the following datasets:
+
+-   Hunan, a geospatial data set in ESRI shapefile format, and
+-   Hunan_2012, an attribute data set in csv format
+
+## Importing Geospatial Data
+
+First, I will be importing *Hunan*.
+
+```{r}
+Hunan <- st_read(dsn="data/geospatial",
+                 layer = "Hunan") 
+```
+
+::: callout-note
+## Note
+
+Check if the bounding box is in decimal deree or not. If it's in decimal degree, it is in geodetic CRS, not projected CRS.
+:::
+
+## Importing Aspatial Data
+
+Now, I will be importing *Hunan_2012.csv* into my R environment
+
+```{r}
+Hunan_2012 = read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+
+## Joining the Data
+
+
+```{r}
+# will lose geometry for sf layer
+hunan_GDPPC <- left_join(Hunan, Hunan_2012) %>%
+  select(1:4, 7, 15)
+```
+
+::: Callout-note
+## Notes
+
+Check if anything can be used to join the data frames (geospatial and aspatial). This can be County name etc.
+
+Also, perform left_join to prevent losing the geometric data
+:::
+
+
+# Plotting the Choropleth Map
+
+```{r}
+tmap_mode("plot")
+tm_shape(hunan_GDPPC) +
+  tm_fill(col="GDPPC",
+         style = "quantile",
+         palette= "Blues",
+         title = "GDPPC") +
+  tm_layout(main.title = "Distribution of GDP per capita by region",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45,
+            legend.width = 0.35,
+            frame= TRUE) +
+  tm_borders(alpha=0.5) +
+  tm_compass(type="8star", size=2) +
+  tm_scale_bar() +
+  tm_grid(alpha=0.2)
+```
+
+
+# Step 1: Deriving Contiguity Weights
+## Queens's Method
+
+You can go directly into the Queen's Method using tidyverse in a singular step:
+
+```{r}
+wm_q <- hunan_GDPPC %>%
+  mutate(nb=st_contiguity(geometry),
+         wt= st_weights(nb,
+                        style = "W"),
+         .before =1)
+
+```
+
+
+:::Callout-note
+### Note
+
+.before = 1 means to ensure one column will always be the first
+May not be necessary in real life applications
+:::
+
+## Computing Global Moran I
+
+
+```{r}
+moranI <- global_moran(wm_q$GDPPC,
+                      wm_q$nb,
+                      wm_q$wt)
+glimpse(moranI)
+```
+
+However, Global Moran I might not be convincing enough
+
+## Performing Global Moran I permutation test
+
+Can do it on multiple simulations (in this case 100. This is because the number of simulations is nsim+1) to confirm the representativeness of the data set.
+
+```{r}
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 99)
+```
+The statistical report above demonstrates that the p-value is smaller than 0.05, which means that this result is significant at a 95% significance level. Hence, we can reject the null hypothesis that the spatial distribution of GDP per capita resembles random distribution. Because the Moran's I value is greater than 0, we can infer that the spatial distribution shows signs of clustering.
+
+:::Callout-note
+### Note
+
+nsim will effect computation time. If you're on a larger data set, you can just do a smaller number (e.g. 99, 49). 999 may take an incredibly long time to load. Test if your compute can handle it within a certain timeframe.
+
+We can also only infer from the results, we can't definitively *prove/disprove* our hypothesis
+:::
+
+
+Complete in-class exercise 5 on our own + watch video for hot and cold spot
