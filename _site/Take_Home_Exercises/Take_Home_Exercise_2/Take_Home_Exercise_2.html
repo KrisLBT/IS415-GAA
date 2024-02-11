@@ -1,15 +1,13 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
-<head>
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.251">
 
-<meta charset="utf-8" />
-<meta name="generator" content="quarto-1.1.251" />
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>IS415-GAA</title>
+<title>IS415-GAA – take_home_exercise_2</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -24,7 +22,23 @@ ul.task-list li input[type="checkbox"] {
 }
 </style>
 
-<!-- htmldependencies:E3FAD763 -->
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -46,101 +60,95 @@ ul.task-list li input[type="checkbox"] {
 }</script>
 
 
-<link rel="stylesheet" href="styles.css" />
+<link rel="stylesheet" href="../../styles.css">
 </head>
 
-<body>
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark ">
       <div class="navbar-container container-fluid">
       <div class="navbar-brand-container">
-    <a class="navbar-brand" href="/index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">IS415-GAA</span>
     </a>
   </div>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
-  aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation"
-  onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
- Hands-on Exercises
-    </a>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">Hands-on Exercises</a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercises">    
         <li>
-    <a class="dropdown-item" href="/Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html">
  <span class="dropdown-text">Hands-on Exercise 01</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02.html">
  <span class="dropdown-text">Hands-on Exercise 02</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
  <span class="dropdown-text">Hands-on Exercise 03 and 04</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex05/Hands-on_Ex05.html">
  <span class="dropdown-text">Hands-on Exercise 05</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex06/Hands-on_Ex06.html">
  <span class="dropdown-text">Hands-on Exercise 06</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
- In-class Exercises
-    </a>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">In-class Exercises</a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercises">    
         <li>
-    <a class="dropdown-item" href="/In-class_Ex/In-class_Ex01/In_class_Ex01.html">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In_class_Ex01.html">
  <span class="dropdown-text">In-class Exercise 01</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/In-class_Ex/In-class_Ex02/In_class_Ex02.html">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex02/In_class_Ex02.html">
  <span class="dropdown-text">In-class Exercise 02</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/In-class_Ex/In-class_Ex03/In_class_Ex03.html">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In_class_Ex03.html">
  <span class="dropdown-text">In-class Exercise 03</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/In-class_Ex/In-class_Ex04/In_class_Ex04.html">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In_class_Ex04.html">
  <span class="dropdown-text">In-class Exercise 04</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="/In-class_Ex/In-class_Ex05/In_class_Ex05.html">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex05/In_class_Ex05.html">
  <span class="dropdown-text">In-class Exercise 05</span></a>
   </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
-    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">
- Take Home Exercises
-    </a>
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercises" role="button" data-bs-toggle="dropdown" aria-expanded="false">Take Home Exercises</a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercises">    
         <li>
-    <a class="dropdown-item" href="/Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html">
+    <a class="dropdown-item" href="../../Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html">
  <span class="dropdown-text">Take_Home_Exercise 01</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02.html">
+ <span class="dropdown-text">Take_Home_Exercise 02</span></a>
   </li>  
     </ul>
   </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="/index.html">
- Home</a>
+    <a class="nav-link" href="../../index.html">Home</a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="/about.html">
- About</a>
+    <a class="nav-link" href="../../about.html">About</a>
   </li>  
 </ul>
               <div id="quarto-search" class="" title="Search"></div>
@@ -153,38 +161,18 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        <div id="quarto-toc-target"></div>
+        
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">IS415-GAA</h1>
-</div>
 
 
 
-<div class="quarto-title-meta">
 
-    
-    
-  </div>
-  
-
-</header>
-
-<p>Welcome to <strong>SMU IS415 Geospatial Analytics and Applications.</strong></p>
-<p>This is the course website for IS415 in AY2022/2023 Semester 2 and is where you can find my course work done for this module.</p>
-<div id="quarto-navigation-envelope" class="hidden">
-<p><span class="hidden" data-render-id="quarto-int-sidebar-title">IS415-GAA</span> <span class="hidden" data-render-id="quarto-int-navbar-title">IS415-GAA</span> <span class="hidden" data-render-id="quarto-int-navbar:Hands-on Exercises">Hands-on Exercises</span> <span class="hidden" data-render-id="quarto-int-navbar:Hands-on Exercise 01">Hands-on Exercise 01</span> <span class="hidden" data-render-id="quarto-int-navbar:Hands-on Exercise 02">Hands-on Exercise 02</span> <span class="hidden" data-render-id="quarto-int-navbar:Hands-on Exercise 03 and 04">Hands-on Exercise 03 and 04</span> <span class="hidden" data-render-id="quarto-int-navbar:Hands-on Exercise 05">Hands-on Exercise 05</span> <span class="hidden" data-render-id="quarto-int-navbar:Hands-on Exercise 06">Hands-on Exercise 06</span> <span class="hidden" data-render-id="quarto-int-navbar:In-class Exercises">In-class Exercises</span> <span class="hidden" data-render-id="quarto-int-navbar:In-class Exercise 01">In-class Exercise 01</span> <span class="hidden" data-render-id="quarto-int-navbar:In-class Exercise 02">In-class Exercise 02</span> <span class="hidden" data-render-id="quarto-int-navbar:In-class Exercise 03">In-class Exercise 03</span> <span class="hidden" data-render-id="quarto-int-navbar:In-class Exercise 04">In-class Exercise 04</span> <span class="hidden" data-render-id="quarto-int-navbar:In-class Exercise 05">In-class Exercise 05</span> <span class="hidden" data-render-id="quarto-int-navbar:Take Home Exercises">Take Home Exercises</span> <span class="hidden" data-render-id="quarto-int-navbar:Take_Home_Exercise 01">Take_Home_Exercise 01</span> <span class="hidden" data-render-id="quarto-int-navbar:Home">Home</span> <span class="hidden" data-render-id="quarto-int-navbar:About">About</span></p>
-</div>
-<div id="quarto-meta-markdown" class="hidden">
-<p><span class="hidden" data-render-id="quarto-metatitle">IS415-GAA</span> <span class="hidden" data-render-id="quarto-twittercardtitle">IS415-GAA</span> <span class="hidden" data-render-id="quarto-ogcardtitle">IS415-GAA</span> <span class="hidden" data-render-id="quarto-metasitename">IS415-GAA</span></p>
-</div>
 
 </main> <!-- /main -->
-<script id = "quarto-html-after-body" type="application/javascript">
+<script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
     const mode = bsSheetEl.getAttribute("data-mode");
@@ -284,6 +272,6 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </script>
 </div> <!-- /content -->
 
-</body>
 
-</html>
+
+</body></html>
