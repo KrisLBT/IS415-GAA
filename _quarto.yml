@@ -37,6 +37,8 @@ website:
         menu:
           - text: "Take_Home_Exercise 01"
             href: "Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html"
+          - text: "Take_Home_Exercise 02"
+            href: "Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02.html"
 
 format:
   html:
