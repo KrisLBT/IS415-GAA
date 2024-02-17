@@ -879,6 +879,13 @@
     "href": "Hands-on_Ex/Hands-on_Ex07/Hands-on_Ex07.html",
     "title": "Hands-on Exercise 7: 2nd Order Spatial Point Patterns Analysis Methods",
     "section": "",
-    "text": "Spatial Point Pattern Analysis is the evaluation of the distribution of a set of points on a surface. It can be used to analyse the spatial distribution of crime, traffic, disease and physical facilities.\nIn this hands-on exercise, I will be answering the following questions:\n\nare the childcare centres in Singapore randomly distributed throughout the country?\nif the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?"
+    "text": "I did this exercise by accident in week 3: Please refer to this site for my work for it"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex07/data/geospatial/MPSZ-2019.html",
+    "href": "Hands-on_Ex/Hands-on_Ex07/data/geospatial/MPSZ-2019.html",
+    "title": "IS415-GAA",
+    "section": "",
+    "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>"
   }
 ]
