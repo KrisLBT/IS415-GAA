@@ -1,0 +1,600 @@
+---
+title: "Take Home Exercise 01: Part 2"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+# Loading of the Packages and Data
+
+## Packages
+
+```{r}
+#loading the packages
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse, arrow, lubridate, spNetwork, classInt)
+```
+
+## Data
+
+```{r}
+# data
+
+# reading the Singapore Master Plan
+mpsz_sf <- st_read(dsn = "../../data/data",
+                layer = "MP14_SUBZONE_WEB_PL") %>%
+  st_transform(3414)
+
+# reading the CoastalOutline
+sg_sf <- st_read(dsn='data/',
+                 layer = "CoastalOutline")
+
+# reading the origin points
+origin_df <- read_rds("data/rds/origin_dfs.rds")
+```
+
+# Data Handling
+
+In this section, I will be recreating the data made in the previous section.
+
+```{r}
+origins_sf <- st_as_sf(origin_df, coords = c("rawlng", "rawlat"),                        crs=4326) %>%   
+  st_transform(crs=3414)
+
+#conversion of sg_sf, mpsz_sf and origins_sf to a generic spatial class
+sg <- as_Spatial(sg_sf)
+mpsz <- as_Spatial(mpsz_sf)
+origins <- as_Spatial(origins_sf) 
+
+# Conversion of sg and origins to SpatialPolygon format
+sg_sp <- as(sg, "SpatialPolygons")
+origins_sp <- as(origins, "SpatialPoints")
+
+# conversion of origins to ppp format
+origins_ppp <- as(origins_sp, "ppp")
+origins_ppp
+```
+
+#### Create Owin Data
+
+Now, we can convert the Coastal Outline to owin data and plot it out.
+
+```{r}
+sg_owin <- as(sg_sp, "owin")
+plot(sg_owin)
+```
+
+#### Combining Events
+
+We will now extract Grab origins within the Singapore CoastalOutline
+
+```{r}
+origins_SG_ppp = origins_ppp[sg_owin]  
+# plotting the distribution of the origins 
+plot(origins_SG_ppp)
+```
+
+# 
+
+# Traditional Kernel Density Estimation Analysis
+
+Now we can begin the traditional kernel density estimation analysis. As mentioned in *Project Overview*, this analysis will enable us to find areas where there is a greater density of origin points. As such, we can find where Grab users tend to book their Grab trips.
+
+## Country Level Analysis
+
+We can begin by trying to find all of the best kernel and bandwidths for the purposes of our analysis. To do this, we need to find the one with the tightest clusters.
+
+In R, we have 4 possible kernel density bandwidths: diggle, ppl, scott and CvL. All of them will be tested below:
+
+```{r}
+#| eval: False  
+#diggle 
+kde_origins_SG.bw <- density(origins_SG_ppp, 
+                             sigma=bw.diggle,
+                             edge=TRUE,
+                             kernel="gaussian")  
+# ppl 
+kde_origins_SG.ppl <- density(origins_SG_ppp,
+                              sigma=bw.ppl,
+                              edge=TRUE,
+                              kernel="gaussian") 
+# CvL 
+kde_origins_SG.CvL <- density(origins_SG_ppp,
+                              sigma=bw.CvL,
+                              edge=TRUE,
+                              kernel="gaussian") 
+# scott 
+kde_origins_SG.scott <- density(origins_SG_ppp,
+                                sigma=bw.scott, 
+                                edge=TRUE,
+                                kernel="gaussian")
+```
+
+We may also plot them out:
+
+```{r}
+#| eval: False 
+par(mfrow=c(2,2)) 
+plot(kde_origins_SG.bw) 
+plot(kde_origins_SG.ppl) 
+plot(kde_origins_SG.CvL) 
+plot(kde_origins_SG.scott)
+```
+
+Now, we can check for the tightness of these clusters:
+
+```{r}
+#| eval: False 
+# tightness of diggle 
+bw.diggle(origins_SG_ppp)  
+# tightness of ppl 
+bw.ppl(origins_SG_ppp)  
+# tightness of CvL 
+bw.CvL(origins_SG_ppp)  
+# tightness of scott 
+bw.scott(origins_SG_ppp) 
+```
+
+We can observe that the smallest sigma value is from diggle, suggesting that it has the tightest clusters of all the bandwidth. Hence, we will continue using diggle for this analysis.
+
+We can also test for different kernels:
+
+```{r}
+par(mfrow=c(2,2)) 
+plot(density(origins_SG_ppp,
+             sigma=bw.diggle,
+             edge=TRUE,
+             kernel="gaussian"),
+     main="Gaussian") 
+plot(density(origins_SG_ppp,
+             sigma=bw.diggle,
+             edge=TRUE,
+             kernel="epanechnikov"),
+     main="Epanechnikov") 
+plot(density(origins_SG_ppp,
+             sigma=bw.diggle,
+             edge=TRUE,
+             kernel="quartic"),
+     main="Quartic") 
+plot(density(origins_SG_ppp,
+             sigma=bw.diggle,
+             edge=TRUE,
+             kernel="disc"),
+     main="Disc") 
+```
+
+As they are identical, there is no need to choose a specific one. Moving forward, I will be using Gaussian kernel.
+
+## Regions of Interest
+
+We can tighten our analysis to include only areas of interest. From the figures above, we observe higher densities in the planning areas Changi, Jurong East, Woodlands and Marine Parade, we can filter out *mpsz* to get them.
+
+```{r}
+# extraction of Changi Airport 
+CA = mpsz_sf[mpsz_sf$PLN_AREA_N=="CHANGI",]  
+# extraction of Jurong East 
+JE = mpsz_sf[mpsz_sf$PLN_AREA_N=="JURONG EAST",]  
+# extraction of Woodlands 
+WL = mpsz_sf[mpsz_sf$PLN_AREA_N=="WOODLANDS",]  
+# extraction of Marine Parade 
+MP = mpsz_sf[mpsz_sf$PLN_AREA_N=='MARINE PARADE',]
+```
+
+With this, we now have to perform the same functions we did in *Create Owin Data* and *Conversions*.
+
+```{r}
+# turn them into spatial 
+CA_spatial <- as_Spatial(CA)
+JE_spatial <- as_Spatial(JE)
+WL_spatial <- as_Spatial(WL)
+MP_spatial <- as_Spatial(MP)  
+
+# turn them into SpatialPolygons 
+CA_sp <- as(CA_spatial, "SpatialPolygons") 
+JE_sp <- as(JE_spatial, "SpatialPolygons") 
+WL_sp <- as(WL_spatial, "SpatialPolygons") 
+MP_sp <- as(MP_spatial, "SpatialPolygons")  
+
+# convert to owin  
+CA_owin = as(CA_sp, "owin") 
+JE_owin = as(JE_sp, "owin") 
+WL_owin = as(WL_sp, "owin") 
+MP_owin = as(MP_sp, "owin")
+```
+
+From here, we can extract the events that occurred in these planning areas.
+
+```{r}
+origins_CA_ppp = origins_SG_ppp[CA_owin] 
+origins_JE_ppp = origins_SG_ppp[JE_owin] 
+origins_WL_ppp = origins_SG_ppp[WL_owin]
+origins_MP_ppp = origins_SG_ppp[MP_owin]
+```
+
+We can now perform the same analysis that we did in *Country Level Analysis*:
+
+```{r}
+kde_origins_CA <- density(origins_CA_ppp,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian")  
+kde_origins_JE <- density(origins_JE_ppp,
+                          sigma=bw.diggle,
+                          edge=TRUE, 
+                          kernel="gaussian")  
+kde_origins_WL <- density(origins_WL_ppp,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian")  
+kde_origins_MP <- density(origins_MP_ppp,
+                          sigma=bw.diggle,
+                          edge=TRUE,
+                          kernel="gaussian") 
+```
+
+We can also plot them out:
+
+```{r}
+par(mfrow=c(2,2)) 
+plot(kde_origins_CA,
+     main="Changi") 
+plot(kde_origins_WL,
+     main="Woodlands")
+plot(kde_origins_JE,
+     main="Jurong East")
+plot(kde_origins_MP,
+     main="Marine Parade")
+```
+
+## Clark and Evans test
+
+The Clark and Evans test allows us to understand if the data points are clustered in any places or not.
+
+### Country Level Analysis
+
+In the below code chunk, we are conducting this test on the origin points in the whole of Singapore. The hypothesis are as follows
+
+H0: The Grab origin points are distributed equally throughout the country
+
+H1: The Grab origin points have clusters.
+
+```{r}
+clarkevans.test(origins_SG_ppp,
+                correction="none",
+                clipregion="sg_owin",
+                alternative=c("clustered"),
+                nsim=99)
+```
+
+From this, we can see that there is clustering (R=0.28039) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+### Regions of Interest
+
+#### Changi
+
+```{r}
+clarkevans.test(origins_CA_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+From this, we can see that there is clustering (R= 0.31778) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+#### Woodlands
+
+```{r}
+clarkevans.test(origins_WL_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+From this, we can see that there is clustering (R= 0.25797) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+#### Jurong East
+
+```{r}
+clarkevans.test(origins_JE_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+From this, we can see that there is clustering (R= 0.25797) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+#### Marine Parade
+
+```{r}
+clarkevans.test(origins_MP_ppp,
+                correction="none",
+                clipregion=NULL,
+                alternative=c("two.sided"),
+                nsim=99)
+```
+
+From this, we can see that there is clustering (R= 0.51201) at a p-value of 2.2e-16. As 2.2e-16 is smaller than 0.05, we can conclude that this difference is significant at a 5% significance level. Hence, we reject the null hypothesis and the Grab origin points have clusters.
+
+# Network Kernel Density Estimation
+
+While the above does show the distribution of the points and which areas are more concentrated than others, they do not account for the network of the roads. In this section, we will be finding the networks (roads) that are more densely used as origins points in Changi Airport and Marina East.
+
+## Data Handling
+
+### Handling of Road Data
+
+Now, we can read the road data as provided by [openstreetmap](https://www.openstreetmap.org/). Note that it provides data for Malaysia, Singapore and Brunei all at once.
+
+```{r}
+#| eval: False 
+#| warnings: False 
+all_roads <- st_read(dsn='../../data/data/data',
+                     layer = 'gis_osm_roads_free_1')
+```
+
+We realise that it is in WGS 84, not in SVY21 so we have to transform the data.
+
+```{r}
+#| eval: False 
+all_roads <- st_transform(all_roads, 3414)
+```
+
+We can check the CRS again for all_roads.
+
+```{r}
+#| eval: False 
+st_crs(all_roads)
+```
+
+Since we're only interested in the roads in mainland Singapore, we have to filter the roads.
+
+```{r}
+#| eval: False 
+# get all roads in mainland Singapore 
+SG_roads <- st_intersection(all_roads, sg_sf)  
+# write out the roads into a separate .shp file for easier future handling 
+st_write(SG_roads, 'data/SG_roads.shp')
+```
+
+We can now read it from here.
+
+```{r}
+SG_roads <- st_read(dsn='data', layer= 'SG_roads')
+```
+
+### Getting the Roads within the Subzones
+
+Now, we can find the streets that exist only inside the subzones.
+
+```{r}
+#| warnings: False  
+# get roads only in the aforementioned subzones 
+CA_roads <- st_intersection(SG_roads, CA) 
+WL_roads <- st_intersection(SG_roads, WL) 
+JE_roads <- st_intersection(SG_roads, JE) 
+MP_roads <- st_intersection(SG_roads, MP)
+```
+
+```{r}
+CA_roads
+WL_roads 
+JE_roads 
+MP_roads
+```
+
+We notice that all of the above are geometry type geometry and not a linestring. We can convert them with the following code chunk:
+
+```{r}
+#| warnings: False 
+CA_roads <- CA_roads %>%   
+  st_cast("LINESTRING")  
+WL_roads <- WL_roads %>%   
+  st_cast("LINESTRING")  
+JE_roads <- JE_roads %>%   
+  st_cast("LINESTRING")  
+MP_roads <- MP_roads %>%   
+  st_cast("LINESTRING")
+```
+
+### Extraction of the Events Within the Subzones
+
+Before we can conduct analysis on the network, we will also need to constrict the events to exclusively the ones that occurred within these two subzones.
+
+```{r}
+#| warnings: False 
+ #extraction of origin events that occurred within Changi and Marine Parade 
+CA_origins <- st_intersection(origins_sf, CA) 
+WL_origins <- st_intersection(origins_sf, WL) 
+JE_origins <- st_intersection(origins_sf, JE) 
+MP_origins <- st_intersection(origins_sf, MP) 
+```
+
+We can now plot this data. In this instance, we can use Changi as an example:
+
+```{r}
+tmap_mode('view') 
+tm_shape(CA_origins)+ 
+  tm_dots() + 
+  tm_shape(CA_roads) +
+  tm_lines()
+tmap_mode('plot')
+```
+
+## **Network Constrained KDE (NetKDE) Analysis**
+
+### Preparing the lixel objects
+
+Before computing NetKDE, the SpatialLines object need to be cut into lixels with a specified minimal distance. This task can be performed by using with *lixelize_lines()* of spNetwork as shown in the code chunk below.
+
+```{r}
+CA_lixels <- lixelize_lines(CA_roads,
+                            750,
+                            mindist = 375) 
+WL_lixels <- lixelize_lines(WL_roads,
+                            750,
+                            mindist = 375) 
+JE_lixels <- lixelize_lines(JE_roads,
+                            750,
+                            mindist = 375) 
+MP_lixels <- lixelize_lines(MP_roads,
+                            750,
+                            mindist = 375)
+```
+
+### Generating Line Points
+
+Next, *lines_center()* of **spNetwork** will be used to generate a SpatialPointsDataFrame (i.e. samples) with line centre points as shown in the code chunk below.
+
+```{r}
+CA_samples <- lines_center(CA_lixels) 
+WL_samples <- lines_center(WL_lixels) 
+JE_samples <- lines_center(JE_lixels) 
+MP_samples <- lines_center(MP_lixels)
+```
+
+### Performing NetKDE
+
+We can now compute the NetKDE using the code chunk below:
+
+```{r}
+# for the purposes of this analysis, the bandwidth will be set to 8.080901, which is the diggle bandwidth for Singapore overall 
+CA_densities <- nkde(CA_roads, 
+                  events = CA_origins,
+                  w = rep(1,nrow(CA_origins)),
+                  samples = CA_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+# care about bw (bandwith) and kernel_name 
+
+JE_densities <- nkde(JE_roads, 
+                  events = JE_origins,
+                  w = rep(1,nrow(JE_origins)),
+                  samples = JE_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+ # care about bw (bandwith) and kernel_name 
+
+WL_densities <- nkde(WL_roads, 
+                  events = WL_origins,
+                  w = rep(1,nrow(WL_origins)),
+                  samples = WL_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+# care about bw (bandwith) and kernel_name 
+
+MP_densities <- nkde(MP_roads, 
+                  events = MP_origins,
+                  w = rep(1,nrow(MP_origins)),
+                  samples = MP_samples,
+                  kernel_name = "quartic",
+                  bw = 8.080901, 
+                  div= "bw", 
+                  method = "simple", 
+                  digits = 1, 
+                  tol = 1,
+                  grid_shape = c(1,1), 
+                  max_depth = 8,
+                  agg = 10, #we aggregate events within a 10m radius (faster calculation)
+                  sparse = TRUE,
+                  verbose = FALSE)
+# care about bw (bandwith) and kernel_name 
+```
+
+### Visualising NetKDE
+
+Before we can visualise the NetKDE values, code chunk below will be used to insert the computed density values (i.e. densities) into *samples* and *lixels* objects as *density* field.
+
+```{r}
+CA_samples$density <- CA_densities
+CA_lixels$density <- CA_densities
+
+JE_samples$density <- JE_densities
+JE_lixels$density <- JE_densities
+
+MP_samples$density <- MP_densities
+MP_lixels$density <- MP_densities
+
+WL_samples$density <- WL_densities
+WL_lixels$density <- WL_densities
+```
+
+We can also rescale to make the values more understandable. Since the values are in kilometres, multiplying the values by 1000 will convert them to metres.
+
+We can use the code chunk below to visualise the network kernel density estimation:
+
+#### Visualising NetKDE for Changi
+
+```{r}
+tmap_mode('view')
+tm_shape(CA_lixels)+
+  tm_lines(col="density")
+tmap_mode('plot')
+```
+
+#### Visualising NetKDE for Jurong East
+
+```{r}
+tmap_mode('view') 
+tm_shape(JE_lixels)+   
+  tm_lines(col="density")  
+tmap_mode('plot')
+```
+
+#### Visualising NetKDE for Marine Parade
+
+```{r}
+tmap_mode('view') 
+tm_shape(MP_lixels)+   
+  tm_lines(col="density")  
+tmap_mode('plot')
+```
+
+#### Visualising NetKDE for Woodlands
+
+```{r}
+tmap_mode('view') 
+tm_shape(WL_lixels)+   
+  tm_lines(col="density")  
+tmap_mode('plot')
+```
+
+# Conclusion
+
+From the above, we can conclude that there is visible clustering where people book Grab rides in Singapore. This could be attributed to the public transportation system being comprehensive and comparatively inexpensive, which disinclines commuters from opting for Grab taxis. Nonetheless, this analysis is inconclusive as it's only the total number of rides for a period of a few. Hence, it may not be representative of population behaviour over time.

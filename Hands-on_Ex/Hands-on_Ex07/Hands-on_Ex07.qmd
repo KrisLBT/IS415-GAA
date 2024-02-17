@@ -1,0 +1,24 @@
+---
+title: "Hands-on Exercise 7: 2nd Order Spatial Point Patterns Analysis Methods"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+# Introduction
+
+Spatial Point Pattern Analysis is the evaluation of the distribution of a set of points on a surface. It can be used to analyse the spatial distribution of crime, traffic, disease and physical facilities.
+
+In this hands-on exercise, I will be answering the following questions:
+
+-   are the childcare centres in Singapore randomly distributed throughout the country?
+
+-   if the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
