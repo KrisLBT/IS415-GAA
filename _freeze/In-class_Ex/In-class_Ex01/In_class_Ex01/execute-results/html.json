@@ -1,0 +1,14 @@
+{
+  "hash": "8f9163fe2482367e93a37a6f83dc3d17",
+  "result": {
+    "markdown": "---\ntitle: \"In-class Exercise 1\"\nexecute:\n  warning: False\n  freeze: True\ndate: \"2024-02-19\"\n---\n\n\nHello\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

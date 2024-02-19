@@ -887,5 +887,54 @@
     "title": "IS415-GAA",
     "section": "",
     "text": "<!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’>"
+  },
+  {
+    "objectID": "Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02.html",
+    "href": "Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02.html",
+    "title": "Take Home Exercise 02",
+    "section": "",
+    "text": "Datasets Used\nFor the purpose of this take-home exercise, two data sets are provided, they are:\n\nTAIWAN_VILLAGE_2020, a geospatial data of village boundary of Taiwan. It is in ESRI shapefile format. The data is in Taiwan Geographic Coordinate System. (Source: Historical map data of the village boundary: TWD97 longitude and latitude)\nDengue_Daily.csv, an aspatial data of reported dengue cases in Taiwan since 1998. (Source: Dengue Daily Confirmed Cases Since 1998. Below are selected fields that are useful for this study:\n\n發病日: Onset date\n最小統計區中心點X: x-coordinate\n最小統計區中心點Y: y-coordinate\n\n\n\n\nLoading of Packages into R Environment\n\n\nShow the code\npacman::p_load(sf, sfdep, tmap, tidyverse)\n\n\n\n\nData Preparation\n\n\nShow the code\ntainan_vil <- st_read(dsn='data/geospatial',\n                 layer = \"TAINAN_VILLAGE\")\n\n\nReading layer `TAINAN_VILLAGE' from data source \n  `D:\\KrisLBT\\IS415-GAA\\Take_Home_Exercises\\Take_Home_Exercise_2\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 649 features and 10 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 120.0269 ymin: 22.88751 xmax: 120.6563 ymax: 23.41374\nGeodetic CRS:  TWD97\n\n\n\n\nShow the code\nD01 <- tainan_vil %>%\n  filter(TOWNID==\"D01\") %>%\n  select()\n\n\n\n\nShow the code\ndengue <- read_csv(\"data/aspatial/Dengue_Daily.csv\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#loading-of-packages",
+    "href": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#loading-of-packages",
+    "title": "In-class Exercise 7",
+    "section": "Loading of Packages",
+    "text": "Loading of Packages\n\n\nShow the code\npacman::p_load(sf, sfdep, tmap, plotly, tidyverse, Kendall)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#geospatial",
+    "href": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#geospatial",
+    "title": "In-class Exercise 7",
+    "section": "Geospatial",
+    "text": "Geospatial\n\n\nShow the code\nhunan <- st_read(dsn = \"data/geospatial\", \n                 layer = \"Hunan\")\n\n\nReading layer `Hunan' from data source \n  `D:\\KrisLBT\\IS415-GAA\\In-class_Ex\\In-class_Ex07\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 88 features and 7 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#importing-apsatial-data",
+    "href": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#importing-apsatial-data",
+    "title": "In-class Exercise 7",
+    "section": "Importing Apsatial Data",
+    "text": "Importing Apsatial Data\n\n\nShow the code\nGDPPC <- read_csv(\"data/aspatial/Hunan_GDPPC.csv\")"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#deriving-the-spatial-weights",
+    "href": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#deriving-the-spatial-weights",
+    "title": "In-class Exercise 7",
+    "section": "Deriving the spatial weights",
+    "text": "Deriving the spatial weights\nThe code chunk below will be used to identify neighbors and to derive an inverse distance weights.\n\n\nShow the code\nGDPPC_nb <- GDPPC_st %>%\n  activate(\"geometry\") %>%\n  mutate(nb = include_self(st_contiguity(geometry)),\n         wt = st_inverse_distance(nb, geometry,\n                                  scale = 1,\n                                  alpha = 1),\n         .before = 1) %>%\n  set_nbs(\"nb\") %>%\n  set_wts(\"wt\")\n\n\n\n\nShow the code\nhead(GDPPC_nb)\n\n\n# A tibble: 6 × 5\n   Year County  GDPPC nb        wt       \n  <dbl> <chr>   <dbl> <list>    <list>   \n1  2005 Anxiang  8184 <int [6]> <dbl [6]>\n2  2005 Hanshou  6560 <int [6]> <dbl [6]>\n3  2005 Jinshi   9956 <int [5]> <dbl [5]>\n4  2005 Li       8394 <int [5]> <dbl [5]>\n5  2005 Linli    8850 <int [5]> <dbl [5]>\n6  2005 Shimen   9244 <int [6]> <dbl [6]>"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#computing-gi-1",
+    "href": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#computing-gi-1",
+    "title": "In-class Exercise 7",
+    "section": "Computing Gi*",
+    "text": "Computing Gi*\nWe can use these new columns to manually calculate the local Gi* for each location. We can do this by grouping by Year and using local_gstar_perm() of sfdep package. After which, we use unnest() to unnest gi_star column of the newly created gi_starts data.frame.\n\n\nShow the code\ngi_stars <- GDPPC_nb %>% \n  group_by(Year) %>% \n  mutate(gi_star = local_gstar_perm(\n    GDPPC, nb, wt)) %>% \n  tidyr::unnest(gi_star)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#arrange-to-show-significant-emerging-hotcold-spots",
+    "href": "In-class_Ex/In-class_Ex07/In_class_Ex07.html#arrange-to-show-significant-emerging-hotcold-spots",
+    "title": "In-class Exercise 7",
+    "section": "Arrange to show significant emerging hot/cold spots",
+    "text": "Arrange to show significant emerging hot/cold spots\n\n\nShow the code\nemerging <- ehsa %>% \n  arrange(sl, abs(tau)) %>% \n  slice(1:5)"
   }
 ]
