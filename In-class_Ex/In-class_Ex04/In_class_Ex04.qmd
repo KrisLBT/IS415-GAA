@@ -11,6 +11,7 @@ execute:
   echo: True
   message: False
   warning: False
+  freeze: True
 date: "`r Sys.Date()`"
 ---
 

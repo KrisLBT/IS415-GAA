@@ -10,6 +10,7 @@ execute:
   eval: True
   echo: True
   warning: False
+  freeze: True
 date: "`r Sys.Date()`"
 ---
 
@@ -34,7 +35,7 @@ In this section, I will be performing the EDA and data handling. Part 2 will be 
 # The Data
 
 | Name                 | Description                                                | Format   | Source                                                                                   |
-|-----------------|-----------------|-----------------|-----------------------|
+|----------------------|------------------------------------------------------------|----------|------------------------------------------------------------------------------------------|
 | MP14_SUBZONE_WEB_PL  | Subzone Boundary of Singapore (2014)                       | .shp     | [data.gov.sg](https://beta.data.gov.sg/datasets/d_d14da225fccf921049ab64238ff473d9/view) |
 | Grab Posisi          | Dataframe of Origin and Destination Locations through Grab | .parquet | Provided by professor                                                                    |
 | gis_osm_roads_free_1 | Road network of Malaysia, Singapore and Brunei             | .shp     | [geofabrik.de](https://download.geofabrik.de/asia/malaysia-singapore-brunei.html)        |

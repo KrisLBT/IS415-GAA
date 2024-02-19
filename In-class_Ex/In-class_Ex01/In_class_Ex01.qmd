@@ -2,8 +2,8 @@
 title: "In-class Exercise 1"
 execute:
   warning: False
+  freeze: True
 date: "`r Sys.Date()`"
 ---
 
-Hello 
-
+Hello

@@ -10,6 +10,7 @@ execute:
   eval: True
   echo: True
   warning: False
+  freeze: True
 date: "`r Sys.Date()`"
 ---
 

@@ -62,3 +62,21 @@ For the purpose of this take-home exercise, two data sets are provided, they are
 ```{r}
 pacman::p_load(sf, sfdep, tmap, tidyverse)
 ```
+
+# Data Preparation
+
+```{r}
+tainan_vil <- st_read(dsn='data/geospatial',
+                 layer = "TAINAN_VILLAGE")
+```
+
+```{r}
+D01 <- tainan_vil %>%
+  filter(TOWNID=="D01") %>%
+  select()
+  
+```
+
+```{r}
+dengue <- read_csv("data/aspatial/Dengue_Daily.csv")
+```
