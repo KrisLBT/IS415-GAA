@@ -121,13 +121,13 @@ Another issue is that we need to analyse the dengue cases from specific weeks 31
 
 ```{r}
 # get the ones from 2023
-dengue_2023 <- filter(dengue, format(發病日, "%Y") == as.character(2023))
+dengue$epiweek <- epiweek(dengue$發病日)
+dengue$epiyear <- epiyear(dengue$發病日)
 
-# convert yymmdd to week format
-dengue_2023$week <- week(dengue_2023$發病日)
+dengue_2023 <- dengue[dengue$epiyear==2023,]
 
 # get only from weeks 31-50
-dengue_2023 <- dengue_2023[dengue_2023$week>=31 & dengue_2023$week<=50,]
+dengue_2023 <- dengue_2023[dengue_2023$epiweek>=31 & dengue_2023$epiweek<=50,]
 ```
 
 ## Data Wrangling

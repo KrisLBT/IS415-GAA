@@ -433,13 +433,13 @@ Geodetic CRS:  TWD97</code></pre>
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get the ones from 2023</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dengue_2023 <span class="ot">&lt;-</span> <span class="fu">filter</span>(dengue, <span class="fu">format</span>(發病日, <span class="st">"%Y"</span>) <span class="sc">==</span> <span class="fu">as.character</span>(<span class="dv">2023</span>))</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># convert yymmdd to week format</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>dengue_2023<span class="sc">$</span>week <span class="ot">&lt;-</span> <span class="fu">week</span>(dengue_2023<span class="sc">$</span>發病日)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dengue<span class="sc">$</span>epiweek <span class="ot">&lt;-</span> <span class="fu">epiweek</span>(dengue<span class="sc">$</span>發病日)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>dengue<span class="sc">$</span>epiyear <span class="ot">&lt;-</span> <span class="fu">epiyear</span>(dengue<span class="sc">$</span>發病日)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>dengue_2023 <span class="ot">&lt;-</span> dengue[dengue<span class="sc">$</span>epiyear<span class="sc">==</span><span class="dv">2023</span>,]</span>
 <span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co"># get only from weeks 31-50</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>dengue_2023 <span class="ot">&lt;-</span> dengue_2023[dengue_2023<span class="sc">$</span>week<span class="sc">&gt;=</span><span class="dv">31</span> <span class="sc">&amp;</span> dengue_2023<span class="sc">$</span>week<span class="sc">&lt;=</span><span class="dv">50</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>dengue_2023 <span class="ot">&lt;-</span> dengue_2023[dengue_2023<span class="sc">$</span>epiweek<span class="sc">&gt;=</span><span class="dv">31</span> <span class="sc">&amp;</span> dengue_2023<span class="sc">$</span>epiweek<span class="sc">&lt;=</span><span class="dv">50</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
