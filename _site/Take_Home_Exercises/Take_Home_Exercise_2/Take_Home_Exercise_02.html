@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-02-19">
+<meta name="dcterms.date" content="2024-02-20">
 
 <title>IS415-GAA - Take Home Exercise 02</title>
 <style>
@@ -214,7 +214,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </li>  
         <li>
     <a class="dropdown-item" href="../../Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02.html">
- <span class="dropdown-text">Take_Home_Exercise 02</span></a>
+ <span class="dropdown-text">Take_Home_Exercise 02 Part 1</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02P2.html">
+ <span class="dropdown-text">Take_Home_Exercise 02 Part 2</span></a>
   </li>  
     </ul>
   </li>
@@ -247,7 +251,16 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   </ul></li>
   <li><a href="#datasets-used" id="toc-datasets-used" class="nav-link" data-scroll-target="#datasets-used">Datasets Used</a></li>
   <li><a href="#loading-of-packages-into-r-environment" id="toc-loading-of-packages-into-r-environment" class="nav-link" data-scroll-target="#loading-of-packages-into-r-environment">Loading of Packages into R Environment</a></li>
-  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
+  <li><a href="#importing-and-wrangling-of-data" id="toc-importing-and-wrangling-of-data" class="nav-link" data-scroll-target="#importing-and-wrangling-of-data">Importing and Wrangling of Data</a>
+  <ul>
+  <li><a href="#importing-of-geospatial-data" id="toc-importing-of-geospatial-data" class="nav-link" data-scroll-target="#importing-of-geospatial-data">Importing of Geospatial Data</a></li>
+  <li><a href="#importing-of-aspatial-data" id="toc-importing-of-aspatial-data" class="nav-link" data-scroll-target="#importing-of-aspatial-data">Importing of Aspatial Data</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling">Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#creating-a-simple-feature-data-frame-from-aspatial-data-frame" id="toc-creating-a-simple-feature-data-frame-from-aspatial-data-frame" class="nav-link" data-scroll-target="#creating-a-simple-feature-data-frame-from-aspatial-data-frame">Creating a simple feature data frame from aspatial data frame</a></li>
+  <li><a href="#extraction-of-districts-of-interest" id="toc-extraction-of-districts-of-interest" class="nav-link" data-scroll-target="#extraction-of-districts-of-interest">Extraction of Districts of Interest</a></li>
+  </ul></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -267,7 +280,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 19, 2024</p>
+      <p class="date">February 20, 2024</p>
     </div>
   </div>
     
@@ -316,6 +329,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </section>
 <section id="loading-of-packages-into-r-environment" class="level1">
 <h1>Loading of Packages into R Environment</h1>
+<p>First, we will be using the following R packages for the analysis</p>
+<ul>
+<li>sf</li>
+<li>sfdep</li>
+<li>tmap</li>
+<li>tidyverse</li>
+</ul>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -323,8 +343,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </details>
 </div>
 </section>
-<section id="data-preparation" class="level1">
-<h1>Data Preparation</h1>
+<section id="importing-and-wrangling-of-data" class="level1">
+<h1>Importing and Wrangling of Data</h1>
+<section id="importing-of-geospatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-of-geospatial-data">Importing of Geospatial Data</h2>
+<p>Now, we will import the map of Tainan.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -342,22 +365,125 @@ Bounding box:  xmin: 120.0269 ymin: 22.88751 xmax: 120.6563 ymax: 23.41374
 Geodetic CRS:  TWD97</code></pre>
 </div>
 </div>
+<p>We notice that instead of WGS84, the data is in TWD97. This is Taiwan’s own projected coordinate system.</p>
+<p>Now, I will plot out the map of Tainan Village</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>D01 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D01"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(tainan_vil[<span class="st">"COUNTYCODE"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_02_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
+</div>
+</section>
+<section id="importing-of-aspatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-of-aspatial-data">Importing of Aspatial Data</h2>
+<p>Now, I will be using <code>read_csv()</code> to import the aspatial data (in csv format) into my R environment</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Dengue_Daily.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>We can check the content of <code>dengue</code> using the following code chunk:</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(dengue)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+# A tibble: 106,861 × 26
+   發病日     個案研判日 通報日     性別  年齡層 居住縣市 居住鄉鎮 居住村里
+   &lt;date&gt;     &lt;chr&gt;      &lt;date&gt;     &lt;chr&gt; &lt;chr&gt;  &lt;chr&gt;    &lt;chr&gt;    &lt;chr&gt;   
+ 1 1998-01-02 None       1998-01-07 男    40-44  屏東縣   屏東市   None    
+ 2 1998-01-03 None       1998-01-14 男    30-34  屏東縣   東港鎮   None    
+ 3 1998-01-13 None       1998-02-18 男    55-59  宜蘭縣   宜蘭市   None    
+ 4 1998-01-15 None       1998-01-23 男    35-39  高雄市   苓雅區   None    
+ 5 1998-01-20 None       1998-02-04 男    55-59  宜蘭縣   五結鄉   None    
+ 6 1998-01-22 None       1998-02-19 男    20-24  桃園市   蘆竹區   None    
+ 7 1998-01-23 None       1998-02-02 男    40-44  新北市   新店區   None    
+ 8 1998-01-26 None       1998-02-19 女    65-69  台北市   北投區   None    
+ 9 1998-02-11 None       1998-02-13 女    25-29  台南市   南區     None    
+10 1998-02-16 None       1998-02-24 男    20-24  高雄市   楠梓區   None    
+# ℹ 106,851 more rows
+# ℹ 18 more variables: 最小統計區 &lt;chr&gt;, 最小統計區中心點X &lt;chr&gt;,
+#   最小統計區中心點Y &lt;chr&gt;, 一級統計區 &lt;chr&gt;, 二級統計區 &lt;chr&gt;,
+#   感染縣市 &lt;chr&gt;, 感染鄉鎮 &lt;chr&gt;, 感染村里 &lt;chr&gt;, 是否境外移入 &lt;chr&gt;,
+#   感染國家 &lt;chr&gt;, 確定病例數 &lt;dbl&gt;, 居住村里代碼 &lt;chr&gt;, 感染村里代碼 &lt;chr&gt;,
+#   血清型 &lt;chr&gt;, 內政部居住縣市代碼 &lt;chr&gt;, 內政部居住鄉鎮代碼 &lt;chr&gt;,
+#   內政部感染縣市代碼 &lt;chr&gt;, 內政部感染鄉鎮代碼 &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>The column names of interest are “通報日” (TL: date), “最小統計區中心點X” (TL: x-coordinate), “最小統計區中心點Y” (TL: y-coordinate).</p>
+<p>We notice that the data in dengue does not list the county name and instead only provides the coordinates of the dengue case. This suggests that we cannot use table joins and we will need to find the points that fall within the specific districts of Tainan Village.</p>
+<p>There are also some rows that have None values in the x- and y- coordinates. We can exclude them using the following code chunk:</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># the None values are a character type so need to omit rows where either 最小統計區中心點X or 最小統計區中心點Y is "None"</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue[<span class="sc">!</span>(dengue<span class="sc">$</span>最小統計區中心點X <span class="sc">==</span> <span class="st">"None"</span> <span class="sc">|</span> dengue<span class="sc">$</span>最小統計區中心點Y <span class="sc">==</span> <span class="st">"None"</span>), ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We also notice that the coordinates in “最小統計區中心點X” and “最小統計區中心點Y” are in projected coordinates system. For now, it is unclear whether this is under the WGS84 coordinate system or TWD97. For now, we will proceed with the assumption that it is in TWD97.</p>
+</section>
+<section id="data-wrangling" class="level2">
+<h2 class="anchored" data-anchor-id="data-wrangling">Data Wrangling</h2>
+<section id="creating-a-simple-feature-data-frame-from-aspatial-data-frame" class="level3">
+<h3 class="anchored" data-anchor-id="creating-a-simple-feature-data-frame-from-aspatial-data-frame">Creating a simple feature data frame from aspatial data frame</h3>
+<p>Now, I will use <code>st_as_sf</code> from the <strong>sf</strong> package to convert the dengue data frame into a simple feature data frame.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dengue_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(dengue,</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                      <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"最小統計區中心點X"</span>,<span class="st">"最小統計區中心點Y"</span>),</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                      <span class="at">crs =</span> <span class="dv">3826</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="extraction-of-districts-of-interest" class="level3">
+<h3 class="anchored" data-anchor-id="extraction-of-districts-of-interest">Extraction of Districts of Interest</h3>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>D01 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D01"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>D02 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D02"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>D04 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D04"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>D06 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D06"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>D07 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D07"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>D08 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D08"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>D32 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D32"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>D39 <span class="ot">&lt;-</span> tainan_vil <span class="sc">%&gt;%</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TOWNID<span class="sc">==</span><span class="st">"D39"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 
 
+</section>
+</section>
 </section>
 
 </main> <!-- /main -->

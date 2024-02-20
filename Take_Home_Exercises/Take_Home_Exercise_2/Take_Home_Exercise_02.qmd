@@ -59,24 +59,110 @@ For the purpose of this take-home exercise, two data sets are provided, they are
 
 # Loading of Packages into R Environment
 
+First, we will be using the following R packages for the analysis
+
+
+-   sf
+-   sfdep
+-   tmap
+-   tidyverse
+
+
 ```{r}
 pacman::p_load(sf, sfdep, tmap, tidyverse)
 ```
 
-# Data Preparation
+# Importing and Wrangling of Data
+## Importing of Geospatial Data
+
+Now, we will import the map of Tainan.
 
 ```{r}
 tainan_vil <- st_read(dsn='data/geospatial',
                  layer = "TAINAN_VILLAGE")
 ```
+We notice that instead of WGS84, the data is in TWD97. This is Taiwan's own projected coordinate system.
+
+Now, I will plot out the map of Tainan Village
+```{r}
+plot(tainan_vil["COUNTYCODE"])
+```
+
+
+## Importing of Aspatial Data
+
+Now, I will be using `read_csv()` to import the aspatial data (in csv format) into my R environment
+
+```{r}
+dengue <- read_csv("data/aspatial/Dengue_Daily.csv")
+```
+
+We can check the content of `dengue` using the following code chunk:
+
+```{r}
+list(dengue)
+```
+The column names of interest are "通報日" (TL: date), "最小統計區中心點X" (TL: x-coordinate), "最小統計區中心點Y" (TL: y-coordinate).
+
+We notice that the data in dengue does not list the county name and instead only provides the coordinates of the dengue case. This suggests that we cannot use table joins and we will need to find the points that fall within the specific districts of Tainan Village. 
+
+There are also some rows that have None values in the x- and y- coordinates. We can exclude them using the following code chunk:
+
+```{r}
+# the None values are a character type so need to omit rows where either 最小統計區中心點X or 最小統計區中心點Y is "None"
+dengue <- dengue[!(dengue$最小統計區中心點X == "None" | dengue$最小統計區中心點Y == "None"), ]
+
+```
+
+We also notice that the coordinates in "最小統計區中心點X" and "最小統計區中心點Y" are in projected coordinates system. For now, it is unclear whether this is under the WGS84 coordinate system or TWD97. For now, we will proceed with the assumption that it is in TWD97.
+
+
+## Data Wrangling
+### Creating a simple feature data frame from aspatial data frame
+
+Now, I will use `st_as_sf` from the **sf** package to convert the dengue data frame into a simple feature data frame.
+
+```{r}
+dengue_sf <- st_as_sf(dengue,
+                      coords = c("最小統計區中心點X","最小統計區中心點Y"),
+                      crs = 3826)
+```
+
+### Extraction of Districts of Interest
 
 ```{r}
 D01 <- tainan_vil %>%
   filter(TOWNID=="D01") %>%
   select()
-  
+
+D02 <- tainan_vil %>%
+  filter(TOWNID=="D02") %>%
+  select()
+
+D04 <- tainan_vil %>%
+  filter(TOWNID=="D04") %>%
+  select()
+
+D06 <- tainan_vil %>%
+  filter(TOWNID=="D06") %>%
+  select()
+
+D07 <- tainan_vil %>%
+  filter(TOWNID=="D07") %>%
+  select()
+
+D08 <- tainan_vil %>%
+  filter(TOWNID=="D08") %>%
+  select()
+
+D32 <- tainan_vil %>%
+  filter(TOWNID=="D32") %>%
+  select()
+
+D39 <- tainan_vil %>%
+  filter(TOWNID=="D39") %>%
+  select()
 ```
 
-```{r}
-dengue <- read_csv("data/aspatial/Dengue_Daily.csv")
-```
+
+
