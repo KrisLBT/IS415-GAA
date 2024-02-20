@@ -66,10 +66,11 @@ First, we will be using the following R packages for the analysis
 -   sfdep
 -   tmap
 -   tidyverse
+-   lubridate
 
 
 ```{r}
-pacman::p_load(sf, sfdep, tmap, tidyverse)
+pacman::p_load(sf, sfdep, tmap, tidyverse, lubridate)
 ```
 
 # Importing and Wrangling of Data
@@ -97,7 +98,7 @@ Now, I will be using `read_csv()` to import the aspatial data (in csv format) in
 dengue <- read_csv("data/aspatial/Dengue_Daily.csv")
 ```
 
-We can check the content of `dengue` using the following code chunk:
+We can check the content of *dengue* using the following code chunk:
 
 ```{r}
 list(dengue)
@@ -106,7 +107,7 @@ The column names of interest are "通報日" (TL: date), "最小統計區中心�
 
 We notice that the data in dengue does not list the county name and instead only provides the coordinates of the dengue case. This suggests that we cannot use table joins and we will need to find the points that fall within the specific districts of Tainan Village. 
 
-There are also some rows that have None values in the x- and y- coordinates. We can exclude them using the following code chunk:
+There are also some rows that have None values in the x- and y- coordinates.We can exclude them using the following code chunk:
 
 ```{r}
 # the None values are a character type so need to omit rows where either 最小統計區中心點X or 最小統計區中心點Y is "None"
@@ -114,8 +115,20 @@ dengue <- dengue[!(dengue$最小統計區中心點X == "None" | dengue$最小統
 
 ```
 
-We also notice that the coordinates in "最小統計區中心點X" and "最小統計區中心點Y" are in projected coordinates system. For now, it is unclear whether this is under the WGS84 coordinate system or TWD97. For now, we will proceed with the assumption that it is in TWD97.
+We also notice that the coordinates in "最小統計區中心點X" and "最小統計區中心點Y" are in projected coordinates system. For now, it is unclear whether this is under the WGS84 coordinate system or TWD97. We will proceed with the assumption that it is in TWD97.
 
+Another issue is that we need to analyse the dengue cases from specific weeks 31-50 in 2023 and the *dengue* contins cases from 1998 and in YMD format. To restrict this, we can also run the following code chunk:
+
+```{r}
+# get the ones from 2023
+dengue_2023 <- filter(dengue, format(發病日, "%Y") == as.character(2023))
+
+# convert yymmdd to week format
+dengue_2023$week <- week(dengue_2023$發病日)
+
+# get only from weeks 31-50
+dengue_2023 <- dengue_2023[dengue_2023$week>=31 & dengue_2023$week<=50,]
+```
 
 ## Data Wrangling
 ### Creating a simple feature data frame from aspatial data frame
