@@ -43,10 +43,9 @@ website:
             href: "Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01.html"
           - text: "Take_Home_Exercise 01 Part 2"
             href: "Take_Home_Exercises/Take_Home_Exercise_1/Take_Home_Exercise_01P2.html"
-          - text: "Take_Home_Exercise 02 Part 1"
-            href: "Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02.html"
-          - text: "Take_Home_Exercise 02 Part 2"
-            href: "Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_02P2.html"
+          - text: "Take_Home_Exercise 02"
+            href: "Take_Home_Exercises/Take_Home_Exercise_2/Take_Home_Exercise_2.html"
+
 
 format:
   html:
