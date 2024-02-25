@@ -262,10 +262,28 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#getting-the-districts-of-interest" id="toc-getting-the-districts-of-interest" class="nav-link" data-scroll-target="#getting-the-districts-of-interest">Getting the Districts of Interest</a></li>
   <li><a href="#getting-the-dengue-cases-of-interest" id="toc-getting-the-dengue-cases-of-interest" class="nav-link" data-scroll-target="#getting-the-dengue-cases-of-interest">Getting the Dengue Cases of Interest</a></li>
   </ul></li>
-  <li><a href="#subsetting-the-dengue-cases-into-the-regions-of-interest" id="toc-subsetting-the-dengue-cases-into-the-regions-of-interest" class="nav-link" data-scroll-target="#subsetting-the-dengue-cases-into-the-regions-of-interest">Subsetting the dengue cases into the regions of interest</a>
+  <li><a href="#subsetting-the-dengue-cases-into-the-regions-of-interest" id="toc-subsetting-the-dengue-cases-into-the-regions-of-interest" class="nav-link" data-scroll-target="#subsetting-the-dengue-cases-into-the-regions-of-interest">Subsetting the Dengue Cases into the Regions of Interest</a></li>
+  <li><a href="#global-and-local-measures-of-spatial-autocorrelation---sfdep-methods" id="toc-global-and-local-measures-of-spatial-autocorrelation---sfdep-methods" class="nav-link" data-scroll-target="#global-and-local-measures-of-spatial-autocorrelation---sfdep-methods">Global and Local Measures of Spatial Autocorrelation - sfdep methods</a>
   <ul>
-  <li><a href="#okay" id="toc-okay" class="nav-link" data-scroll-target="#okay">okay</a></li>
+  <li><a href="#preparation-of-data" id="toc-preparation-of-data" class="nav-link" data-scroll-target="#preparation-of-data">Preparation of Data</a>
+  <ul class="collapse">
+  <li><a href="#joining-the-attribute-tables" id="toc-joining-the-attribute-tables" class="nav-link" data-scroll-target="#joining-the-attribute-tables">Joining the Attribute Tables</a></li>
+  <li><a href="#visualisation-using-a-choropleth-map" id="toc-visualisation-using-a-choropleth-map" class="nav-link" data-scroll-target="#visualisation-using-a-choropleth-map">Visualisation using a Choropleth map</a></li>
+  <li><a href="#deriving-contiguity-weights-queens-method" id="toc-deriving-contiguity-weights-queens-method" class="nav-link" data-scroll-target="#deriving-contiguity-weights-queens-method">Deriving Contiguity weights: Queen’s Method</a></li>
   </ul></li>
+  <li><a href="#global-measure-of-spatial-autocorrelation" id="toc-global-measure-of-spatial-autocorrelation" class="nav-link" data-scroll-target="#global-measure-of-spatial-autocorrelation">Global Measure of Spatial Autocorrelation</a>
+  <ul class="collapse">
+  <li><a href="#computing-global-morans-i-permutation-test" id="toc-computing-global-morans-i-permutation-test" class="nav-link" data-scroll-target="#computing-global-morans-i-permutation-test">Computing Global Moran’s I Permutation Test</a></li>
+  </ul></li>
+  <li><a href="#local-measure-of-spatial-autocorrelation" id="toc-local-measure-of-spatial-autocorrelation" class="nav-link" data-scroll-target="#local-measure-of-spatial-autocorrelation">Local Measure of Spatial Autocorrelation</a>
+  <ul class="collapse">
+  <li><a href="#local-morans-i" id="toc-local-morans-i" class="nav-link" data-scroll-target="#local-morans-i">Local Moran’s I</a></li>
+  <li><a href="#visualising-local-morans-i" id="toc-visualising-local-morans-i" class="nav-link" data-scroll-target="#visualising-local-morans-i">Visualising Local Moran’s I</a></li>
+  <li><a href="#visualising-local-morans-i-and-p-values" id="toc-visualising-local-morans-i-and-p-values" class="nav-link" data-scroll-target="#visualising-local-morans-i-and-p-values">Visualising Local Moran’s I and p-values</a></li>
+  <li><a href="#visualising-a-lisa-map" id="toc-visualising-a-lisa-map" class="nav-link" data-scroll-target="#visualising-a-lisa-map">Visualising a LISA map</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#creating-a-time-series-cube" id="toc-creating-a-time-series-cube" class="nav-link" data-scroll-target="#creating-a-time-series-cube">Creating a time-series cube</a></li>
   </ul>
 </nav>
     </div>
@@ -357,7 +375,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tainan <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>,</span>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>tainan_vil <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">layer=</span><span class="st">"TAINAN_VILLAGE"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
@@ -420,14 +438,14 @@ Geodetic CRS:  TWD97</code></pre>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>districts <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"D01"</span>,<span class="st">"D02"</span>,<span class="st">"D04"</span>,<span class="st">"D06"</span>,<span class="st">"D07"</span>,<span class="st">"D08"</span>,<span class="st">"D32"</span>,<span class="st">"D39"</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="co">#restricting the village into just the required districts</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>counties_sf <span class="ot">=</span> tainan[tainan<span class="sc">$</span>TOWNID <span class="sc">%in%</span> districts, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>districts_sf <span class="ot">=</span> tainan_vil[tainan_vil<span class="sc">$</span>TOWNID <span class="sc">%in%</span> districts, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>However, we also face the problem of repeated village names in different towns. To fix this, we can specify the village name with the town name:</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>counties_sf<span class="sc">$</span>VILLNAME <span class="ot">&lt;-</span> <span class="fu">paste</span>(counties_sf<span class="sc">$</span>TOWNNAME, counties_sf<span class="sc">$</span>VILLNAME,</span>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>districts_sf<span class="sc">$</span>VILLNAME <span class="ot">&lt;-</span> <span class="fu">paste</span>(districts_sf<span class="sc">$</span>TOWNNAME, districts_sf<span class="sc">$</span>VILLNAME,</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sep =</span> <span class="st">"_"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -448,7 +466,7 @@ Geodetic CRS:  TWD97</code></pre>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue[dengue<span class="sc">$</span>epiweek<span class="sc">&gt;=</span><span class="dv">31</span> <span class="sc">&amp;</span> dengue<span class="sc">$</span>epiweek<span class="sc">&lt;=</span><span class="dv">50</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>I also wanted to let the VILLNAME in dengue follow the same format as the VILLNAME in <em>tainan</em>.</p>
+<p>I also wanted to let the VILLNAME in dengue follow the same format as the VILLNAME in <em>tainan_vil</em>.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -529,7 +547,7 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue <span class="sc">%&gt;%</span> </span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         VILLNAME  <span class="sc">%in%</span> counties_sf<span class="sc">$</span>VILLNAME)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         VILLNAME  <span class="sc">%in%</span> districts_sf<span class="sc">$</span>VILLNAME)</span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dengue<span class="sc">$</span><span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"None"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
@@ -541,13 +559,13 @@ Geodetic CRS:  TWD97</code></pre>
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create sf object after handling missing values</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dengue_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(dengue, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"X-Coordinate"</span>, <span class="st">"Y-Coordinate"</span>), <span class="at">crs =</span> <span class="fu">st_crs</span>(counties_sf))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>dengue_sf <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(dengue, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"X-Coordinate"</span>, <span class="st">"Y-Coordinate"</span>), <span class="at">crs =</span> <span class="fu">st_crs</span>(districts_sf))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
 </section>
 <section id="subsetting-the-dengue-cases-into-the-regions-of-interest" class="level1">
-<h1>Subsetting the dengue cases into the regions of interest</h1>
+<h1>Subsetting the Dengue Cases into the Regions of Interest</h1>
 <p>Since the dengue cases is for the whole of Tainan Village and not just the districts, we will need to take only the cases that happened within the districts of interest. Morever, we need to retain crucial information such as the epidemiological week that the case occurred in, the village and number of cases per week.</p>
 <p>Before that, we can get the total number of cases per week per village in a given town.</p>
 <div class="cell">
@@ -564,8 +582,8 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate all combinations of VILLNAME from counties_sf and weeks from 31 to 50</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">VILLNAME =</span> <span class="fu">unique</span>(counties_sf<span class="sc">$</span>VILLNAME),</span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate all combinations of VILLNAME from districts_sf and weeks from 31 to 50</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">VILLNAME =</span> <span class="fu">unique</span>(districts_sf<span class="sc">$</span>VILLNAME),</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">epiweek =</span> <span class="dv">31</span><span class="sc">:</span><span class="dv">50</span>)</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join with dengueCounty to retain existing records</span></span>
@@ -578,14 +596,32 @@ Geodetic CRS:  TWD97</code></pre>
 <span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<section id="okay" class="level2">
-<h2 class="anchored" data-anchor-id="okay">okay</h2>
+</section>
+<section id="global-and-local-measures-of-spatial-autocorrelation---sfdep-methods" class="level1">
+<h1>Global and Local Measures of Spatial Autocorrelation - sfdep methods</h1>
+<p>Now, I will analyse the global and local measures of spatial autocorrelation. This will allow us to answer the following questions:</p>
+<ul>
+<li>Are dengue cases distributed evenly geographically?</li>
+<li>If not, is there signs of spatial clustering?</li>
+<li>If yes, where are these clusters?</li>
+</ul>
+<p>There are many ways to perform this. In this exercise, I will be using the Moran’s I for both.</p>
+<p>Before we conduct this analysis, we will need to prepare the data.</p>
+<section id="preparation-of-data" class="level2">
+<h2 class="anchored" data-anchor-id="preparation-of-data">Preparation of Data</h2>
+<section id="joining-the-attribute-tables" class="level3">
+<h3 class="anchored" data-anchor-id="joining-the-attribute-tables">Joining the Attribute Tables</h3>
+<p>I will be joining <em>districts_sf</em> with <em>dengueCountyComplete</em> so we can analyse the global and local spatial autocorrelation.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tainan_dengue <span class="ot">&lt;-</span> <span class="fu">left_join</span>(counties_sf, dengueCountyComplete)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tainan_dengue <span class="ot">&lt;-</span> <span class="fu">left_join</span>(districts_sf, dengueCountyComplete)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="visualisation-using-a-choropleth-map" class="level3">
+<h3 class="anchored" data-anchor-id="visualisation-using-a-choropleth-map">Visualisation using a Choropleth map</h3>
+<p>We can visualise the distribution using a choropleth map:</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -595,7 +631,7 @@ Geodetic CRS:  TWD97</code></pre>
 <span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>, </span>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"Blues"</span>,</span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"WEEKLY_DENGUE_CASE_NUM"</span>) <span class="sc">+</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Distribution of case number per capita by county, Hunan Province"</span>,</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Distribution of case number"</span>,</span>
 <span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">1.2</span>,</span>
 <span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.height =</span> <span class="fl">0.45</span>, </span>
@@ -610,20 +646,259 @@ Geodetic CRS:  TWD97</code></pre>
 <p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>I will now try and create the time series cube from <em>dengue_county</em></p>
+<p>We can also visualise this data according to month. For this, I will be using the month of September:</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dengue_county_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(dengueCountyComplete, counties_sf,</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.loc_col=</span><span class="st">"VILLNAME"</span>,</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.time_col =</span><span class="st">"epiweek"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>sept <span class="ot">&lt;-</span> tainan_dengue <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(epiweek<span class="sc">&gt;</span><span class="dv">35</span> <span class="sc">&amp;</span> epiweek<span class="sc">&lt;</span><span class="dv">40</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tainan_dengue) <span class="sc">+</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"WEEKLY_DENGUE_CASE_NUM"</span>, </span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>, </span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">palette =</span> <span class="st">"Blues"</span>,</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">title =</span> <span class="st">"WEEKLY_DENGUE_CASE_NUM"</span>) <span class="sc">+</span></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Distribution of case number in September"</span>,</span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">1.2</span>,</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.height =</span> <span class="fl">0.45</span>, </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.width =</span> <span class="fl">0.35</span>,</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_compass</span>(<span class="at">type=</span><span class="st">"8star"</span>, <span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_scale_bar</span>() <span class="sc">+</span></span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_grid</span>(<span class="at">alpha =</span><span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We notice that from the quantiles that it is very negatively skewed. As such, this suggests that there could be some clustering for the dengue cases.</p>
+</section>
+<section id="deriving-contiguity-weights-queens-method" class="level3">
+<h3 class="anchored" data-anchor-id="deriving-contiguity-weights-queens-method">Deriving Contiguity weights: Queen’s Method</h3>
+<p>We will now derive the contiguity weights using the Queen’s method.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">&lt;-</span> tainan_dengue <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_weights</span>(nb,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">style =</span> <span class="st">"W"</span>),</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We can get a basic overview of <em>wm_q</em> using the following code chunk:</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>wm_q</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 5160 features and 14 fields
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 120.0627 ymin: 22.89401 xmax: 120.2925 ymax: 23.09144
+Geodetic CRS:  TWD97
+First 10 features:
+                                                                                                                                                                                                                                                                                                                                                                                                                       nb
+1  2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+2  1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+3  1, 2, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+4  1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+5  1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+6  1, 2, 3, 4, 5, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+7  1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+8  1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+9  1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+10  1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 2341, 2342, 2343, 2344, 2345, 2346, 2347, 2348, 2349, 2350, 2351, 2352, 2353, 2354, 2355, 2356, 2357, 2358, 2359, 2360, 3181, 3182, 3183, 3184, 3185, 3186, 3187, 3188, 3189, 3190, 3191, 3192, 3193, 3194, 3195, 3196, 3197, 3198, 3199, 3200
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   wt
+1  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+2  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+3  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+4  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+5  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+6  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+7  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+8  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+9  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+10 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
+      VILLCODE COUNTYNAME TOWNNAME      VILLNAME      VILLENG COUNTYID
+1  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+2  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+3  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+4  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+5  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+6  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+7  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+8  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+9  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+10 67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
+   COUNTYCODE TOWNID TOWNCODE NOTE epiweek WEEKLY_DENGUE_CASE_NUM
+1       67000    D06 67000350 &lt;NA&gt;      31                      0
+2       67000    D06 67000350 &lt;NA&gt;      32                      0
+3       67000    D06 67000350 &lt;NA&gt;      33                      0
+4       67000    D06 67000350 &lt;NA&gt;      34                      0
+5       67000    D06 67000350 &lt;NA&gt;      35                      0
+6       67000    D06 67000350 &lt;NA&gt;      36                      0
+7       67000    D06 67000350 &lt;NA&gt;      37                      1
+8       67000    D06 67000350 &lt;NA&gt;      38                      0
+9       67000    D06 67000350 &lt;NA&gt;      39                      0
+10      67000    D06 67000350 &lt;NA&gt;      40                      0
+                         geometry
+1  POLYGON ((120.1176 23.08387...
+2  POLYGON ((120.1176 23.08387...
+3  POLYGON ((120.1176 23.08387...
+4  POLYGON ((120.1176 23.08387...
+5  POLYGON ((120.1176 23.08387...
+6  POLYGON ((120.1176 23.08387...
+7  POLYGON ((120.1176 23.08387...
+8  POLYGON ((120.1176 23.08387...
+9  POLYGON ((120.1176 23.08387...
+10 POLYGON ((120.1176 23.08387...</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="global-measure-of-spatial-autocorrelation" class="level2">
+<h2 class="anchored" data-anchor-id="global-measure-of-spatial-autocorrelation">Global Measure of Spatial Autocorrelation</h2>
+<section id="computing-global-morans-i-permutation-test" class="level3">
+<h3 class="anchored" data-anchor-id="computing-global-morans-i-permutation-test">Computing Global Moran’s I Permutation Test</h3>
+<p>As opposed to a standard, Global Moran’s I test, a Global Moran’s I permutation test allows us to test if the data follows a random distribution by simulating many test, as opposed to just one.</p>
+<p>It is alway a good practice to use set.seed() before performing simulation. This is to ensure that the computation is reproducible.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Next, <code>global_moran_perm()</code> is used to perform Monte Carlo simulation. It will run 100 simulations.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">global_moran_perm</span>(wm_q<span class="sc">$</span>WEEKLY_DENGUE_CASE_NUM,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                       wm_q<span class="sc">$</span>nb,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                       wm_q<span class="sc">$</span>wt,</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">nsim =</span> <span class="dv">99</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Monte-Carlo simulation of Moran I
+
+data:  x 
+weights: listw  
+number of simulations + 1: 100 
+
+statistic = 0.15977, observed rank = 100, p-value &lt; 2.2e-16
+alternative hypothesis: two.sided</code></pre>
+</div>
+</div>
+<p>The statistical report above show that the p-value is smaller than alpha value of 0.05. Hence, we have enough statistical evidence to reject the null hypothesis that the spatial distribution of dengue case resemble random distribution (i.e.&nbsp;independent from spatial). Because the Moran’s I statistics is greater than 0. We can infer that the spatial distribution shows sign of clustering.</p>
+</section>
+</section>
+<section id="local-measure-of-spatial-autocorrelation" class="level2">
+<h2 class="anchored" data-anchor-id="local-measure-of-spatial-autocorrelation">Local Measure of Spatial Autocorrelation</h2>
+<section id="local-morans-i" class="level3">
+<h3 class="anchored" data-anchor-id="local-morans-i">Local Moran’s I</h3>
+<p>In this section,I will be computing the Local Moran’s I of <em>tainan_dengue</em> using <code>local_moran()</code>.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>lisa <span class="ot">&lt;-</span> wm_q <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">local_moran =</span> <span class="fu">local_moran</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    WEEKLY_DENGUE_CASE_NUM, nb, wt, <span class="at">nsim =</span> <span class="dv">99</span>),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">unnest</span>(local_moran)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="visualising-local-morans-i" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-local-morans-i">Visualising Local Moran’s I</h3>
+<p>In this code chunk below, tmap functions are used prepare a choropleth map by using value in the ii field.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lisa) <span class="sc">+</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"ii"</span>) <span class="sc">+</span> </span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Local Moran's I of Dengue Cases"</span>,</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="visualising-local-morans-i-and-p-values" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-local-morans-i-and-p-values">Visualising Local Moran’s I and p-values</h3>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>map1 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(lisa) <span class="sc">+</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"ii"</span>) <span class="sc">+</span> </span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">6</span>,<span class="dv">8</span>)) <span class="sc">+</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Local Moran's I of Dengue Cases"</span>,</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">0.8</span>)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>map2 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(lisa) <span class="sc">+</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"p_ii"</span>,</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a>          <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="dv">1</span>),</span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>              <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"0.001"</span>, <span class="st">"0.01"</span>, <span class="st">"0.05"</span>, <span class="st">"Not sig"</span>)) <span class="sc">+</span> </span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"p-value of Local Moran's I"</span>,</span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">0.8</span>)</span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(map1, map2, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="visualising-a-lisa-map" class="level3">
+<h3 class="anchored" data-anchor-id="visualising-a-lisa-map">Visualising a LISA map</h3>
+<p>LISA map is a categorical map showing outliers and clusters. There are two types of outliers namely: High-Low and Low-High outliers. Likewise, there are two type of clusters namely: High-High and Low-Low cluaters. In fact, LISA map is an interpreted map by combining local Moran’s I of geographical areas and their respective p-values.</p>
+<p>In lisa sf data.frame, we can find three fields contain the LISA categories. They are mean, median and pysal. In general, classification in mean will be used as shown in the code chunk below.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>lisa_sig <span class="ot">&lt;-</span> lisa  <span class="sc">%&gt;%</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_ii <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lisa) <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(lisa_sig) <span class="sc">+</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"mean"</span>) <span class="sc">+</span> </span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="creating-a-time-series-cube" class="level1">
+<h1>Creating a time-series cube</h1>
+<p>I will now try and create the time series cube from <em>dengueCountyComplete</em></p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>dengue_county_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(dengueCountyComplete, districts_sf,</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.loc_col=</span><span class="st">"VILLNAME"</span>,</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.time_col =</span><span class="st">"epiweek"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Next, <code>is_spacetime_cube()</code> will be used to verify if <em>dengue_county_st</em> is indeed a time series cube.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_spacetime_cube</span>(dengue_county_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_spacetime_cube</span>(dengue_county_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
@@ -631,7 +906,6 @@ Geodetic CRS:  TWD97</code></pre>
 </div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
