@@ -448,11 +448,20 @@ Geodetic CRS:  TWD97</code></pre>
 <span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue[dengue<span class="sc">$</span>epiweek<span class="sc">&gt;=</span><span class="dv">31</span> <span class="sc">&amp;</span> dengue<span class="sc">$</span>epiweek<span class="sc">&lt;=</span><span class="dv">50</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+<p>I also wanted to let the VILLNAME in dengue follow the same format as the VILLNAME in <em>tainan</em>.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dengue<span class="sc">$</span>VILLNAME <span class="ot">&lt;-</span> <span class="fu">paste</span>(dengue<span class="sc">$</span>TOWNNAME, </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                         dengue<span class="sc">$</span>VILLNAME,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sep =</span> <span class="st">"_"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <p>We can use the <code>summary()</code> function to investigate the contents of <em>dengue</em></p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dengue)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dengue)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>     發病日            個案研判日            通報日          
@@ -517,24 +526,15 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>         VILLNAME  <span class="sc">%in%</span> tainan<span class="sc">$</span>VILLNAME)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dengue<span class="sc">$</span><span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"None"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue <span class="sc">%&gt;%</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         VILLNAME  <span class="sc">%in%</span> counties_sf<span class="sc">$</span>VILLNAME)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dengue<span class="sc">$</span><span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"None"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
 </div>
-</div>
-<p>I also wanted to let the VILLNAME in dengue follow the same format as the VILLNAME in <em>tainan</em>.</p>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dengue<span class="sc">$</span>VILLNAME <span class="ot">&lt;-</span> <span class="fu">paste</span>(dengue<span class="sc">$</span>TOWNNAME, </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                         dengue<span class="sc">$</span>VILLNAME,</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sep =</span> <span class="st">"_"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 <p>Finally, I will be converting dengue into an <strong>sf</strong> object.</p>
 <div class="cell">
@@ -564,11 +564,11 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate all combinations of VILLNAME and week from 31 to 50</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">VILLNAME =</span> <span class="fu">unique</span>(dengueCounty<span class="sc">$</span>VILLNAME),</span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate all combinations of VILLNAME from counties_sf and weeks from 31 to 50</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">VILLNAME =</span> <span class="fu">unique</span>(counties_sf<span class="sc">$</span>VILLNAME),</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">epiweek =</span> <span class="dv">31</span><span class="sc">:</span><span class="dv">50</span>)</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join with dengue_grp to retain existing records</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join with dengueCounty to retain existing records</span></span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> <span class="fu">left_join</span>(all_combinations, dengueCounty, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"VILLNAME"</span>, <span class="st">"epiweek"</span>))</span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace missing sums with 0</span></span>
@@ -610,53 +610,24 @@ Geodetic CRS:  TWD97</code></pre>
 <p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>counties_sf <span class="ot">&lt;-</span> counties_sf <span class="sc">%&gt;%</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(VILLNAME <span class="sc">%in%</span> <span class="fu">unique</span>(dengueCountyComplete<span class="sc">$</span>VILLNAME))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 <p>I will now try and create the time series cube from <em>dengue_county</em></p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>dengue_county_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(dengueCountyComplete, counties_sf,</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.loc_col=</span><span class="st">"VILLNAME"</span>,</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.time_col =</span><span class="st">"epiweek"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>dengue_county_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(dengueCountyComplete, counties_sf,</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.loc_col=</span><span class="st">"VILLNAME"</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>                              <span class="at">.time_col =</span><span class="st">"epiweek"</span> )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>Next, <code>is_spacetime_cube()</code> will be used to verify if <em>dengue_county_st</em> is indeed a time series cube.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_spacetime_cube</span>(dengue_county_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">is_spacetime_cube</span>(dengue_county_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] FALSE</code></pre>
+<pre><code>[1] TRUE</code></pre>
 </div>
-</div>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a dataframe with all combinations of village and week</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">VILLNAME =</span> <span class="fu">unique</span>(dengue_per_county<span class="sc">$</span>VILLNAME),</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">epiweek =</span> <span class="fu">unique</span>(dengue_per_county<span class="sc">$</span>epiweek))</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join with the dengue_per_county_complete dataframe</span></span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>dengue_per_county_complete <span class="ot">&lt;-</span> all_combinations <span class="sc">%&gt;%</span></span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dengue_per_county, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"VILLNAME"</span>, <span class="st">"epiweek"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">WEEKLY_DENGUE_CASE_NUM =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(WEEKLY_DENGUE_CASE_NUM), <span class="dv">0</span>, WEEKLY_DENGUE_CASE_NUM))  <span class="co"># Replace missing sums with 0</span></span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Now, you should have a complete dataframe with all combinations of village and week</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details>
-<summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Assuming df is your dataframe and col_name is the name of the column</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>num_unique <span class="ot">&lt;-</span> <span class="fu">length</span>(<span class="fu">unique</span>(dengueCountyComplete<span class="sc">$</span>VILLNAME))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
 </div>
 
 
