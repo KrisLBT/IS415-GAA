@@ -16,7 +16,3 @@ date: "`r Sys.Date()`"
 # Oops
 
 I did this exercise by accident in week 3: Please refer to [this site](https://is415-gaa-krislbt.netlify.app/hands-on_ex/hands-on_ex03/hands-on_ex03#analysiing-spatial-point-process-using-g-function) for my work for it
-
-
-
-
