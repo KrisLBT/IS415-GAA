@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-02-25">
+<meta name="dcterms.date" content="2024-02-27">
 
 <title>IS415-GAA - Take Home Exercise 2</title>
 <style>
@@ -283,7 +283,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#visualising-a-lisa-map" id="toc-visualising-a-lisa-map" class="nav-link" data-scroll-target="#visualising-a-lisa-map">Visualising a LISA map</a></li>
   </ul></li>
   </ul></li>
+  <li><a href="#emerging-hot-spot-analysis" id="toc-emerging-hot-spot-analysis" class="nav-link" data-scroll-target="#emerging-hot-spot-analysis">Emerging Hot Spot Analysis</a>
+  <ul>
   <li><a href="#creating-a-time-series-cube" id="toc-creating-a-time-series-cube" class="nav-link" data-scroll-target="#creating-a-time-series-cube">Creating a time-series cube</a></li>
+  <li><a href="#computing-gi" id="toc-computing-gi" class="nav-link" data-scroll-target="#computing-gi">Computing Gi*</a></li>
+  <li><a href="#mann-kendall-test" id="toc-mann-kendall-test" class="nav-link" data-scroll-target="#mann-kendall-test">Mann-Kendall Test</a></li>
+  <li><a href="#performing-emerging-hotspot-analysis" id="toc-performing-emerging-hotspot-analysis" class="nav-link" data-scroll-target="#performing-emerging-hotspot-analysis">Performing Emerging Hotspot Analysis</a></li>
+  <li><a href="#visualising-the-distribution-of-ehsa-dates" id="toc-visualising-the-distribution-of-ehsa-dates" class="nav-link" data-scroll-target="#visualising-the-distribution-of-ehsa-dates">Visualising the distribution of EHSA dates</a></li>
+  <li><a href="#visualising-ehsa" id="toc-visualising-ehsa" class="nav-link" data-scroll-target="#visualising-ehsa">Visualising EHSA</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -303,7 +311,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 25, 2024</p>
+      <p class="date">February 27, 2024</p>
     </div>
   </div>
     
@@ -359,11 +367,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>tmap</p></li>
 <li><p>tidyverse</p></li>
 <li><p>lubridate</p></li>
+<li><p>plotly</p></li>
 </ul>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, sfdep, tmap, tidyverse, lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, sfdep, tmap, tidyverse, lubridate, plotly)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -445,8 +454,7 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>districts_sf<span class="sc">$</span>VILLNAME <span class="ot">&lt;-</span> <span class="fu">paste</span>(districts_sf<span class="sc">$</span>TOWNNAME, districts_sf<span class="sc">$</span>VILLNAME,</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sep =</span> <span class="st">"_"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>districts_sf <span class="ot">&lt;-</span> <span class="fu">unite</span>(districts_sf, VILLNAME, TOWNNAME, VILLNAME, <span class="at">sep =</span> <span class="st">"-"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -470,9 +478,7 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dengue<span class="sc">$</span>VILLNAME <span class="ot">&lt;-</span> <span class="fu">paste</span>(dengue<span class="sc">$</span>TOWNNAME, </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>                         dengue<span class="sc">$</span>VILLNAME,</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sep =</span> <span class="st">"_"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> <span class="fu">unite</span>(dengue, VILLNAME, TOWNNAME, VILLNAME, <span class="at">sep =</span> <span class="st">"-"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>We can use the <code>summary()</code> function to investigate the contents of <em>dengue</em></p>
@@ -489,65 +495,58 @@ Geodetic CRS:  TWD97</code></pre>
  Mean   :2023-10-03                      Mean   :2023-10-05  
  3rd Qu.:2023-10-25                      3rd Qu.:2023-10-27  
  Max.   :2023-12-16                      Max.   :2023-12-23  
-     性別              年齡層           COUNTYNAME          TOWNNAME        
+     性別              年齡層           COUNTYNAME          VILLNAME        
  Length:25475       Length:25475       Length:25475       Length:25475      
  Class :character   Class :character   Class :character   Class :character  
  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
                                                                             
                                                                             
                                                                             
-   VILLNAME          最小統計區        X-Coordinate       Y-Coordinate      
+  最小統計區        X-Coordinate       Y-Coordinate        一級統計區       
  Length:25475       Length:25475       Length:25475       Length:25475      
  Class :character   Class :character   Class :character   Class :character  
  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
                                                                             
                                                                             
                                                                             
-  一級統計區         二級統計區          感染縣市           感染鄉鎮        
+  二級統計區          感染縣市           感染鄉鎮           感染村里        
  Length:25475       Length:25475       Length:25475       Length:25475      
  Class :character   Class :character   Class :character   Class :character  
  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
                                                                             
                                                                             
                                                                             
-   感染村里         是否境外移入         感染國家           確定病例數
- Length:25475       Length:25475       Length:25475       Min.   :1   
- Class :character   Class :character   Class :character   1st Qu.:1   
- Mode  :character   Mode  :character   Mode  :character   Median :1   
-                                                          Mean   :1   
-                                                          3rd Qu.:1   
-                                                          Max.   :1   
- 居住村里代碼       感染村里代碼          血清型          內政部居住縣市代碼
+ 是否境外移入         感染國家           確定病例數 居住村里代碼      
+ Length:25475       Length:25475       Min.   :1    Length:25475      
+ Class :character   Class :character   1st Qu.:1    Class :character  
+ Mode  :character   Mode  :character   Median :1    Mode  :character  
+                                       Mean   :1                      
+                                       3rd Qu.:1                      
+                                       Max.   :1                      
+ 感染村里代碼          血清型          內政部居住縣市代碼 內政部居住鄉鎮代碼
  Length:25475       Length:25475       Length:25475       Length:25475      
  Class :character   Class :character   Class :character   Class :character  
  Mode  :character   Mode  :character   Mode  :character   Mode  :character  
                                                                             
                                                                             
                                                                             
- 內政部居住鄉鎮代碼 內政部感染縣市代碼 內政部感染鄉鎮代碼    epiweek     
- Length:25475       Length:25475       Length:25475       Min.   :31.00  
- Class :character   Class :character   Class :character   1st Qu.:37.00  
- Mode  :character   Mode  :character   Mode  :character   Median :40.00  
-                                                          Mean   :39.96  
-                                                          3rd Qu.:43.00  
-                                                          Max.   :50.00  
-    epiyear    
- Min.   :2023  
- 1st Qu.:2023  
- Median :2023  
- Mean   :2023  
- 3rd Qu.:2023  
- Max.   :2023  </code></pre>
+ 內政部感染縣市代碼 內政部感染鄉鎮代碼    epiweek         epiyear    
+ Length:25475       Length:25475       Min.   :31.00   Min.   :2023  
+ Class :character   Class :character   1st Qu.:37.00   1st Qu.:2023  
+ Mode  :character   Mode  :character   Median :40.00   Median :2023  
+                                       Mean   :39.96   Mean   :2023  
+                                       3rd Qu.:43.00   3rd Qu.:2023  
+                                       Max.   :50.00   Max.   :2023  </code></pre>
 </div>
 </div>
 <p>Looking through the dataframe, I noticed that there are some “None” values in the X- and Y-coordinates. I will remove them using the following:</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> dengue <span class="sc">%&gt;%</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span>,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         VILLNAME  <span class="sc">%in%</span> districts_sf<span class="sc">$</span>VILLNAME)</span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> <span class="fu">subset</span>(dengue, <span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span> <span class="sc">&amp;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                             <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span> <span class="sc">&amp;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                             VILLNAME <span class="sc">%in%</span> districts_sf<span class="sc">$</span>VILLNAME)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dengue<span class="sc">$</span><span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"None"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
@@ -572,7 +571,7 @@ Geodetic CRS:  TWD97</code></pre>
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>dengueCounty <span class="ot">&lt;-</span> dengue <span class="sc">%&gt;%</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TOWNNAME, VILLNAME, epiweek) <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(VILLNAME, epiweek) <span class="sc">%&gt;%</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">WEEKLY_DENGUE_CASE_NUM=</span><span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
 <span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(VILLNAME <span class="sc">!=</span> <span class="st">"None"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -590,10 +589,7 @@ Geodetic CRS:  TWD97</code></pre>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> <span class="fu">left_join</span>(all_combinations, dengueCounty, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"VILLNAME"</span>, <span class="st">"epiweek"</span>))</span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace missing sums with 0</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> <span class="fu">mutate</span>(dengueCountyComplete, <span class="at">WEEKLY_DENGUE_CASE_NUM =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(WEEKLY_DENGUE_CASE_NUM), <span class="dv">0</span>, WEEKLY_DENGUE_CASE_NUM))</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> dengueCountyComplete <span class="sc">%&gt;%</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="dv">1</span>,<span class="dv">2</span>,<span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> <span class="fu">mutate</span>(dengueCountyComplete, <span class="at">WEEKLY_DENGUE_CASE_NUM =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(WEEKLY_DENGUE_CASE_NUM), <span class="dv">0</span>, WEEKLY_DENGUE_CASE_NUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 </section>
@@ -695,7 +691,7 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>wm_q</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>Simple feature collection with 5160 features and 14 fields
+<pre><code>Simple feature collection with 5160 features and 13 fields
 Geometry type: POLYGON
 Dimension:     XY
 Bounding box:  xmin: 120.0627 ymin: 22.89401 xmax: 120.2925 ymax: 23.09144
@@ -723,39 +719,28 @@ First 10 features:
 8  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
 9  0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
 10 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823, 0.01265823
-      VILLCODE COUNTYNAME TOWNNAME      VILLNAME      VILLENG COUNTYID
-1  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-2  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-3  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-4  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-5  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-6  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-7  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-8  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-9  67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-10 67000350032     臺南市   安南區 安南區_青草里 Qingcao Vil.        D
-   COUNTYCODE TOWNID TOWNCODE NOTE epiweek WEEKLY_DENGUE_CASE_NUM
-1       67000    D06 67000350 &lt;NA&gt;      31                      0
-2       67000    D06 67000350 &lt;NA&gt;      32                      0
-3       67000    D06 67000350 &lt;NA&gt;      33                      0
-4       67000    D06 67000350 &lt;NA&gt;      34                      0
-5       67000    D06 67000350 &lt;NA&gt;      35                      0
-6       67000    D06 67000350 &lt;NA&gt;      36                      0
-7       67000    D06 67000350 &lt;NA&gt;      37                      1
-8       67000    D06 67000350 &lt;NA&gt;      38                      0
-9       67000    D06 67000350 &lt;NA&gt;      39                      0
-10      67000    D06 67000350 &lt;NA&gt;      40                      0
-                         geometry
-1  POLYGON ((120.1176 23.08387...
-2  POLYGON ((120.1176 23.08387...
-3  POLYGON ((120.1176 23.08387...
-4  POLYGON ((120.1176 23.08387...
-5  POLYGON ((120.1176 23.08387...
-6  POLYGON ((120.1176 23.08387...
-7  POLYGON ((120.1176 23.08387...
-8  POLYGON ((120.1176 23.08387...
-9  POLYGON ((120.1176 23.08387...
-10 POLYGON ((120.1176 23.08387...</code></pre>
+      VILLCODE COUNTYNAME      VILLNAME      VILLENG COUNTYID COUNTYCODE TOWNID
+1  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+2  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+3  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+4  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+5  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+6  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+7  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+8  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+9  67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+10 67000350032     臺南市 安南區-青草里 Qingcao Vil.        D      67000    D06
+   TOWNCODE NOTE epiweek WEEKLY_DENGUE_CASE_NUM                       geometry
+1  67000350 &lt;NA&gt;      31                      0 POLYGON ((120.1176 23.08387...
+2  67000350 &lt;NA&gt;      32                      0 POLYGON ((120.1176 23.08387...
+3  67000350 &lt;NA&gt;      33                      0 POLYGON ((120.1176 23.08387...
+4  67000350 &lt;NA&gt;      34                      0 POLYGON ((120.1176 23.08387...
+5  67000350 &lt;NA&gt;      35                      0 POLYGON ((120.1176 23.08387...
+6  67000350 &lt;NA&gt;      36                      0 POLYGON ((120.1176 23.08387...
+7  67000350 &lt;NA&gt;      37                      1 POLYGON ((120.1176 23.08387...
+8  67000350 &lt;NA&gt;      38                      0 POLYGON ((120.1176 23.08387...
+9  67000350 &lt;NA&gt;      39                      0 POLYGON ((120.1176 23.08387...
+10 67000350 &lt;NA&gt;      40                      0 POLYGON ((120.1176 23.08387...</code></pre>
 </div>
 </div>
 </section>
@@ -883,8 +868,11 @@ alternative hypothesis: two.sided</code></pre>
 </section>
 </section>
 </section>
-<section id="creating-a-time-series-cube" class="level1">
-<h1>Creating a time-series cube</h1>
+<section id="emerging-hot-spot-analysis" class="level1">
+<h1>Emerging Hot Spot Analysis</h1>
+<p>We can also analyse the emerging hot spots of dengue clusters in the villages in Tainan Village.</p>
+<section id="creating-a-time-series-cube" class="level2">
+<h2 class="anchored" data-anchor-id="creating-a-time-series-cube">Creating a time-series cube</h2>
 <p>I will now try and create the time series cube from <em>dengueCountyComplete</em></p>
 <div class="cell">
 <details>
@@ -904,8 +892,141 @@ alternative hypothesis: two.sided</code></pre>
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
+</section>
+<section id="computing-gi" class="level2">
+<h2 class="anchored" data-anchor-id="computing-gi">Computing Gi*</h2>
+<p>The code chunk below will be used to identify neighbors and to derive an inverse distance weights.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>dengue_county_nb <span class="ot">&lt;-</span> dengue_county_st <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, geometry,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">scale =</span> <span class="dv">1</span>,</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>                                  <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>We can now visualise the head of <em>dengue_county_nb</em></p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(dengue_county_nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  VILLNAME      epiweek WEEKLY_DENGUE_CASE_NUM nb        wt       
+  &lt;chr&gt;           &lt;dbl&gt;                  &lt;dbl&gt; &lt;list&gt;    &lt;list&gt;   
+1 安南區-青草里      31                      0 &lt;int [4]&gt; &lt;dbl [4]&gt;
+2 仁德區-保安里      31                      1 &lt;int [6]&gt; &lt;dbl [6]&gt;
+3 中西區-赤嵌里      31                      0 &lt;int [9]&gt; &lt;dbl [9]&gt;
+4 南區-大成里        31                      0 &lt;int [7]&gt; &lt;dbl [7]&gt;
+5 安南區-城北里      31                      0 &lt;int [5]&gt; &lt;dbl [5]&gt;
+6 安南區-城南里      31                      0 &lt;int [8]&gt; &lt;dbl [8]&gt;</code></pre>
+</div>
+</div>
+<p>We can use these new columns to manually calculate the local Gi* for each location. We can do this by grouping by Year and using local_gstar_perm() of sfdep package. After which, we use unnest() to unnest gi_star column of the newly created gi_starts data.frame.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>gi_stars <span class="ot">&lt;-</span> dengue_county_nb <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(epiweek) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gi_star =</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    WEEKLY_DENGUE_CASE_NUM, nb, wt)) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(gi_star)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="mann-kendall-test" class="level2">
+<h2 class="anchored" data-anchor-id="mann-kendall-test">Mann-Kendall Test</h2>
+<p>We can now test the significance of the local Gi* for each location and plot it out.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>ehsa <span class="ot">&lt;-</span> gi_stars <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(VILLNAME) <span class="sc">%&gt;%</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">mk =</span> <span class="fu">list</span>(</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unclass</span>(</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>      Kendall<span class="sc">::</span><span class="fu">MannKendall</span>(gi_star)))) <span class="sc">%&gt;%</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest_wider</span>(mk)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now, we can arrange it to show significant hot/cold spots</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>emerging <span class="ot">&lt;-</span> ehsa <span class="sc">%&gt;%</span> </span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(sl, <span class="fu">abs</span>(tau)) <span class="sc">%&gt;%</span> </span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="performing-emerging-hotspot-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="performing-emerging-hotspot-analysis">Performing Emerging Hotspot Analysis</h2>
+<p>Lastly, we will perform EHSA analysis by using <code>emerging_hotspot_analysis()</code> of sfdep package. It takes a spacetime object x (i.e.&nbsp;dengue_county_sf), and the quoted name of the variable of interest (i.e.&nbsp;WEEKLY_DENGUE_CASE_NUM) for .var argument. The k argument is used to specify the number of time lags which is set to 1 by default. Lastly, nsim map numbers of simulation to be performed.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>ehsa <span class="ot">&lt;-</span> <span class="fu">emerging_hotspot_analysis</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> dengue_county_st, </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">.var =</span> <span class="st">"WEEKLY_DENGUE_CASE_NUM"</span>, </span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">k =</span> <span class="dv">1</span>, </span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">nsim =</span> <span class="dv">99</span></span>
+<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+</section>
+<section id="visualising-the-distribution-of-ehsa-dates" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-the-distribution-of-ehsa-dates">Visualising the distribution of EHSA dates</h2>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> ehsa,</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> classification)) <span class="sc">+</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="visualising-ehsa" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-ehsa">Visualising EHSA</h2>
+<p>Now that we know the distribution of the number and type of hot/cold spots in Tainan Village, we should also visualise it.</p>
+<p>Before we do this, we must join <em>districts_sf</em> with <em>ehsa</em>.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>district_ehsa <span class="ot">&lt;-</span> districts_sf <span class="sc">%&gt;%</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(ehsa,</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">join_by</span>(VILLNAME <span class="sc">==</span> location))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Next, tmap functions will be used to plot a categorical choropleth map by using the code chunk below.</p>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>ehsa_sig <span class="ot">&lt;-</span> district_ehsa  <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(p_value <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(district_ehsa) <span class="sc">+</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(ehsa_sig) <span class="sc">+</span></span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"classification"</span>) <span class="sc">+</span> </span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
