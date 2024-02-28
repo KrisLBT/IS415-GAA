@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2024-02-27">
+<meta name="dcterms.date" content="2024-02-28">
 
 <title>IS415-GAA - Take Home Exercise 2</title>
 <style>
@@ -311,7 +311,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">February 27, 2024</p>
+      <p class="date">February 28, 2024</p>
     </div>
   </div>
     
@@ -322,39 +322,46 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <section id="project-overview" class="level1">
 <h1>Project Overview</h1>
-<p>From prof:</p>
-<p>As a curious geospatial analytics green horn, you are interested to discover:</p>
+<p>In 2023, Taiwan recorded the <a href="https://focustaiwan.tw/society/202310030018">worst outbreak of dengue fever since 2015.</a> The outbreak mostly centered in Tainan, <a href="https://www.tainan.gov.tw/en/News_Content.aspx?n=13205&amp;s=8592883">prompting escalated rates of inspections in high-risk areas and buildings</a>.</p>
+<p>The general criteria to label an area high-risk would be a place that has poor gutter structural design, blockages in the drain or are largely abandoned. Such issues increase the chance of water remaining stagnant and facilitates the continued reproduction of mosquitoes, the vector through which dengue fever is perpetuated.</p>
+<p>While this criteria is well-founded, it is possible to improve the identification of high-risk areas to enable more efficient use of resources through more precise targeting.</p>
+<p>To do so, we will need to</p>
 <ul>
-<li><p>if the distribution of dengue fever outbreak at Tainan City, Taiwan are independent from space and space and time.</p></li>
-<li><p>If the outbreak is indeed spatial and spatio-temporal dependent, then, you would like to detect where are the clusters and outliers, and the emerging hot spot/cold spot areas.</p></li>
+<li><p>Identify if the distribution of dengue fever outbreak in Tainan City, Taiwan is independent spatially or spatio-temporally and if so,</p></li>
+<li><p>Identify the present hot and cold areas, as well as emergent ones</p></li>
 </ul>
 <section id="general-outline-of-project" class="level2">
 <h2 class="anchored" data-anchor-id="general-outline-of-project">General Outline of Project</h2>
-<p>The specific tasks of this take-home exercise are as follows:</p>
+<p>I will be investigating the spatial autocorrelation of dengue fever in Tainan City, on both a local and global level. The global autocorrelation tells us if there are signs of clustering for the entirety of the dataset. Local autocorrelation further shows us the relationship of the clustering in a given area to its neighbours (e.g.&nbsp;if a hotspot is surrounded by coldspots and vice-versa).</p>
+<p>This project also encompasses an analysis of the spatio-temporal autocorrelation of dengue, which allows us to identify any emergent hotspots in the dataset.</p>
+<p>For this project, the analysis will be limited to Tainan City, the epicentre of dengue in Taiwan, specifically the following counties in Tainan City:</p>
 <ul>
-<li><p>Using appropriate function of <strong>sf</strong> and <strong>tidyverse</strong>, preparing the following geospatial data layer:</p>
-<ul>
-<li><p>a study area layer in sf polygon features. It must be at village level and confined to the D01, D02, D04, D06, D07, D08, D32 and D39 counties of Tainan City, Taiwan.</p></li>
-<li><p>a dengue fever layer within the study area in sf point features. The dengue fever cases should be confined to epidemiology week 31-50, 2023.</p></li>
-<li><p>a derived dengue fever layer in <a href="https://sfdep.josiahparry.com/articles/spacetime-s3">spacetime s3 class of sfdep</a>. It should contain, among many other useful information, a data field showing number of dengue fever cases by village and by epidemiology week.</p></li>
-</ul></li>
-<li><p>Using the extracted data, perform <a href="https://r4gdsa.netlify.app/chap09.html">global spatial autocorrelation analysis</a>.</p></li>
-<li><p>Using the extracted data, perform <a href="https://r4gdsa.netlify.app/chap10.html">local spatial autocorrelation analysis</a>.</p></li>
-<li><p>Using the extracted data, perform <a href="https://is415-ay2023-24t2.netlify.app/th_ex2">emerging hotspot analysis</a>.</p></li>
-<li><p>Describe the spatial patterns revealed by the analysis above.</p></li>
+<li><p>D01</p></li>
+<li><p>D02</p></li>
+<li><p>D04</p></li>
+<li><p>D06</p></li>
+<li><p>D07</p></li>
+<li><p>D08</p></li>
+<li><p>D32</p></li>
+<li><p>D39</p></li>
 </ul>
+<p>The analysis will be limited to the specific timeframe where dengue cases spiked in 2023, which were epidemiological weeks 31-50.</p>
+<p>After performing all of the analysis, I will discuss the outcome of the results.</p>
 </section>
 </section>
 <section id="datasets-used" class="level1">
 <h1>Datasets Used</h1>
-<p>For the purpose of this take-home exercise, two data sets are provided, they are:</p>
+<p>I will be using the following data sets (provided by the professor):</p>
 <ul>
 <li><p>TAIWAN_VILLAGE_2020, a geospatial data of village boundary of Taiwan. It is in ESRI shapefile format. The data is in Taiwan Geographic Coordinate System. (Source: <a href="https://data.gov.tw/en/datasets/130549">Historical map data of the village boundary: TWD97 longitude and latitude</a>)</p></li>
 <li><p>Dengue_Daily.csv, an aspatial data of reported dengue cases in Taiwan since 1998. (Source: <a href="https://data.cdc.gov.tw/en/dataset/dengue-daily-determined-cases-1998">Dengue Daily Confirmed Cases Since 1998</a>. Below are selected fields that are useful for this study:</p>
 <ul>
 <li><p>發病日: Onset date</p></li>
-<li><p>最小統計區中心點X: x-coordinate</p></li>
-<li><p>最小統計區中心點Y: y-coordinate</p></li>
+<li><p>最小統計區中心點X: X-coordinate</p></li>
+<li><p>最小統計區中心點Y: Y-coordinate</p></li>
+<li><p>居住縣市: County name</p></li>
+<li><p>居住村里: Village name</p></li>
+<li><p>居住鄉鎮: Town name</p></li>
 </ul></li>
 </ul>
 </section>
@@ -362,12 +369,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h1>Loading of Packages</h1>
 <p>We will be using the following R packages for this exercise:</p>
 <ul>
-<li><p>sf</p></li>
-<li><p>sfdep</p></li>
-<li><p>tmap</p></li>
-<li><p>tidyverse</p></li>
-<li><p>lubridate</p></li>
-<li><p>plotly</p></li>
+<li><p><em>sf</em>: Package for handing spatial data</p></li>
+<li><p><em>sfdep</em>: Package for testing the space-time autocorrelation of data</p></li>
+<li><p><em>tmap</em>: Package to generate thematic maps</p></li>
+<li><p><em>tidyverse</em>: Collection of packages for data science. This collection includes tidyr, ggplot2 and dplyr, among others</p></li>
+<li><p><em>lubridate</em>: Package to handle dates and times</p></li>
+<li><p><em>plotly</em>: Package to create interactive maps in R.</p></li>
 </ul>
 <div class="cell">
 <details>
@@ -429,17 +436,7 @@ Geodetic CRS:  TWD97</code></pre>
 <h1>Data Wrangling</h1>
 <section id="getting-the-districts-of-interest" class="level2">
 <h2 class="anchored" data-anchor-id="getting-the-districts-of-interest">Getting the Districts of Interest</h2>
-<p>For the purposes of our analysis, we are only interested in the following districts:</p>
-<ul>
-<li>D01</li>
-<li>D02</li>
-<li>D04</li>
-<li>D06</li>
-<li>D07</li>
-<li>D08</li>
-<li>D32</li>
-<li>D39</li>
-</ul>
+<p>We will be restricting <em>tainan_vil</em> to the counties mentioned above.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -543,11 +540,14 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> <span class="fu">subset</span>(dengue, <span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span> <span class="sc">&amp;</span> </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                             <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span> <span class="sc">&amp;</span></span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>                             VILLNAME <span class="sc">%in%</span> districts_sf<span class="sc">$</span>VILLNAME)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dengue<span class="sc">$</span><span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"None"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># removing rows with None values in X-Coordinates and Y-Coordinates</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># note that X- and Y-Coordinates are both in character form and not numerical form</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>dengue <span class="ot">&lt;-</span> <span class="fu">subset</span>(dengue, <span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span> <span class="sc">&amp;</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>                             <span class="st">`</span><span class="at">Y-Coordinate</span><span class="st">`</span> <span class="sc">!=</span> <span class="st">"None"</span> <span class="sc">&amp;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>                             VILLNAME <span class="sc">%in%</span> districts_sf<span class="sc">$</span>VILLNAME)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># assess if any None values remain</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="fu">sum</span>(dengue<span class="sc">$</span><span class="st">`</span><span class="at">X-Coordinate</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"None"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 0</code></pre>
@@ -581,14 +581,14 @@ Geodetic CRS:  TWD97</code></pre>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate all combinations of VILLNAME from districts_sf and weeks from 31 to 50</span></span>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># generate all combinations of VILLNAME from districts_sf and weeks from 31 to 50</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>all_combinations <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(<span class="at">VILLNAME =</span> <span class="fu">unique</span>(districts_sf<span class="sc">$</span>VILLNAME),</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>                                <span class="at">epiweek =</span> <span class="dv">31</span><span class="sc">:</span><span class="dv">50</span>)</span>
 <span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Left join with dengueCounty to retain existing records</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># left join with dengueCounty to retain existing records</span></span>
 <span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> <span class="fu">left_join</span>(all_combinations, dengueCounty, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"VILLNAME"</span>, <span class="st">"epiweek"</span>))</span>
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Replace missing sums with 0</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># replace missing sums with 0</span></span>
 <span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>dengueCountyComplete <span class="ot">&lt;-</span> <span class="fu">mutate</span>(dengueCountyComplete, <span class="at">WEEKLY_DENGUE_CASE_NUM =</span> <span class="fu">if_else</span>(<span class="fu">is.na</span>(WEEKLY_DENGUE_CASE_NUM), <span class="dv">0</span>, WEEKLY_DENGUE_CASE_NUM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
@@ -669,7 +669,7 @@ Geodetic CRS:  TWD97</code></pre>
 <p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>We notice that from the quantiles that it is very negatively skewed. As such, this suggests that there could be some clustering for the dengue cases.</p>
+<p>We notice that from the quantiles that it is very positively skewed. As such, this suggests that there could be some clustering for the dengue cases.</p>
 </section>
 <section id="deriving-contiguity-weights-queens-method" class="level3">
 <h3 class="anchored" data-anchor-id="deriving-contiguity-weights-queens-method">Deriving Contiguity weights: Queen’s Method</h3>
@@ -749,15 +749,15 @@ First 10 features:
 <h2 class="anchored" data-anchor-id="global-measure-of-spatial-autocorrelation">Global Measure of Spatial Autocorrelation</h2>
 <section id="computing-global-morans-i-permutation-test" class="level3">
 <h3 class="anchored" data-anchor-id="computing-global-morans-i-permutation-test">Computing Global Moran’s I Permutation Test</h3>
-<p>As opposed to a standard, Global Moran’s I test, a Global Moran’s I permutation test allows us to test if the data follows a random distribution by simulating many test, as opposed to just one.</p>
-<p>It is alway a good practice to use set.seed() before performing simulation. This is to ensure that the computation is reproducible.</p>
+<p>In this project, I opted to use a Global Moran’s I permutation test as opposed to a standard, Global Moran’s I test, as it would allow us to test the spatial autocorrelation using multiple simulation of tests instead of just 1.</p>
+<p>To ensure the results are reproducable, I will be setting the seed.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<p>Next, <code>global_moran_perm()</code> is used to perform Monte Carlo simulation. It will run 100 simulations.</p>
+<p>Next, <code>global_moran_perm()</code> is used to perform Monte Carlo simulation. It will run 100 simulations (n = 99+1.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -778,7 +778,7 @@ statistic = 0.15977, observed rank = 100, p-value &lt; 2.2e-16
 alternative hypothesis: two.sided</code></pre>
 </div>
 </div>
-<p>The statistical report above show that the p-value is smaller than alpha value of 0.05. Hence, we have enough statistical evidence to reject the null hypothesis that the spatial distribution of dengue case resemble random distribution (i.e.&nbsp;independent from spatial). Because the Moran’s I statistics is greater than 0. We can infer that the spatial distribution shows sign of clustering.</p>
+<p>The statistical report above show that the p-value is smaller than alpha value of 0.05. Hence, we have enough statistical evidence to reject the null hypothesis that the spatial distribution of dengue case resemble random distribution (i.e.&nbsp;independent from spatial). Because the Moran’s I statistics is greater than 0. We can infer that the spatial distribution shows signs of clustering.</p>
 </section>
 </section>
 <section id="local-measure-of-spatial-autocorrelation" class="level2">
@@ -815,9 +815,11 @@ alternative hypothesis: two.sided</code></pre>
 <p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>The negative values suggest that the area is an outlier (i.e.&nbsp;a high-value area surrounded by low-value areas and vice-versa).</p>
 </section>
 <section id="visualising-local-morans-i-and-p-values" class="level3">
 <h3 class="anchored" data-anchor-id="visualising-local-morans-i-and-p-values">Visualising Local Moran’s I and p-values</h3>
+<p>While the above does show the outliers in the dataset, it is also helpful to visualise it along with the p-values, showing the probability of the result being significant.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
@@ -843,6 +845,7 @@ alternative hypothesis: two.sided</code></pre>
 <p><img src="Take_Home_Exercise_2_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+<p>We can see that the majority of the not significant (p-value &gt; 0.05) areas correspond the negative values in ii. This suggests that the distribution of dengue cases are largely consistent throughout the counties.</p>
 </section>
 <section id="visualising-a-lisa-map" class="level3">
 <h3 class="anchored" data-anchor-id="visualising-a-lisa-map">Visualising a LISA map</h3>
@@ -873,7 +876,7 @@ alternative hypothesis: two.sided</code></pre>
 <p>We can also analyse the emerging hot spots of dengue clusters in the villages in Tainan Village.</p>
 <section id="creating-a-time-series-cube" class="level2">
 <h2 class="anchored" data-anchor-id="creating-a-time-series-cube">Creating a time-series cube</h2>
-<p>I will now try and create the time series cube from <em>dengueCountyComplete</em></p>
+<p>I will now create the time series cube from <em>dengueCountyComplete</em></p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
