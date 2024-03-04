@@ -8,6 +8,7 @@ format:
     toc-depth: 4
 execute:
   eval: True
+  freeze: True
   echo: True
   warning: False
 date: "`r Sys.Date()`"
