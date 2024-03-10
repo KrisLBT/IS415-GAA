@@ -1,0 +1,18 @@
+---
+title: "Hands-on Exercise 10"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  warning: False
+date: "`r Sys.Date()`"
+---
+
+# OOPS
+
+You can click [here](https://is415-gaa-krislbt.netlify.app/hands-on_ex/hands-on_ex08/hands-on_ex08) for my work

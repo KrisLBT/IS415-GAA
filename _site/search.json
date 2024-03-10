@@ -1391,5 +1391,12 @@
     "title": "In-class Exercise 8",
     "section": "Computing neighbours list",
     "text": "Computing neighbours list\n\n\nShow the code\nshan.nb <- poly2nb(shan_sf)\nsummary(shan.nb)\n\n\nNeighbour list object:\nNumber of regions: 55 \nNumber of nonzero links: 264 \nPercentage nonzero weights: 8.727273 \nAverage number of links: 4.8 \nLink number distribution:\n\n 2  3  4  5  6  7  8  9 \n 5  9  7 21  4  3  5  1 \n5 least connected regions:\n3 5 7 9 47 with 2 links\n1 most connected region:\n8 with 9 links\n\n\n\n\nShow the code\nplot(st_geometry(shan_sf),\n     border=grey(.5))\n\npts = st_coordinates(st_centroid(shan_sf)) # create the centroid circles\nplot(shan.nb,\n     pts,\n     col=\"blue\",\n     add= TRUE)\n\n\n\n\n\nNote: can continue using pts since it’s saved into environment\nAll the same as Hands-on Exercise 9"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html",
+    "href": "Hands-on_Ex/Hands-on_Ex10/Hands-on_Ex10.html",
+    "title": "Hands-on Exercise 10",
+    "section": "",
+    "text": "You can click here for my work"
   }
 ]
