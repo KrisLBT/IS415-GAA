@@ -294,6 +294,14 @@ ggplot(data=condo_resale.sf,
 
 ### **Multiple Linear Regression Method**
 
+Simpler Method:
+
+```{r}
+#| fig-width: 12
+#| fig-height: 10
+ggcorrmat(condo_resale[, 5:23])
+```
+
 #### Visualising the relationships of the independent variables
 
 Before building a multiple regression model, it is important to ensure that the indepdent variables used are not highly correlated to each other. If these highly correlated independent variables are used in building a regression model by mistake, the quality of the model will be compromised. This phenomenon is known as **multicollinearity** in statistics.
@@ -349,7 +357,7 @@ The [**gtsummary**](https://www.danieldsjoberg.com/gtsummary/) package provides 
 In the code chunk below, [`tbl_regression()`](https://www.danieldsjoberg.com/gtsummary/reference/tbl_regression.html) is used to create a well formatted regression report.
 
 ```{r}
-tbl_regression(condo.mlr1, intercept = TRUE)
+tbl_regression(condo.mlr1, intercept = TRUE) #include Intercept to include intercept
 ```
 
 With gtsummary package, model statistics can be included in the report by either appending them to the report table by using [`add_glance_table()`](https://www.danieldsjoberg.com/gtsummary/reference/add_glance.html) or adding as a table source note by using [`add_glance_source_note()`](https://www.danieldsjoberg.com/gtsummary/reference/add_glance.html) as shown in the code chunk below.
@@ -365,6 +373,12 @@ tbl_regression(condo.mlr1,
 ```
 
 For more customisation options, refer to [Tutorial: tbl_regression](https://www.danieldsjoberg.com/gtsummary/articles/tbl_regression.html)
+
+```{r}
+mlr.p <- ggcoefstats(condo.mlr1,
+                     sort='ascending')
+mlr.p
+```
 
 #### Checking for multicolinearity
 
@@ -608,6 +622,10 @@ gwr.adaptive
 ```
 
 The report shows that the AICc the adaptive distance gwr is 41982.22 which is even smaller than the AICc of the fixed distance gwr of 42263.61.
+
+It's better than non-spatial as it has a higher adjusted R squared (i.e. able to explain the variance better)
+
+It also has a greater AICC.
 
 ## Visualising GWR Output
 
