@@ -10,6 +10,7 @@ execute:
   eval: True
   echo: True
   warning: False
+  freeze: True
 date: "`r Sys.Date()`"
 ---
 
@@ -459,8 +460,8 @@ The code churn below will turn on the interactive mode of **tmap**.
 ```{r}
 tmap_mode("view")
 ```
-The code chunks below is used to create an interactive point symbol map.
 
+The code chunks below is used to create an interactive point symbol map.
 
 ```{r}
 tm_shape(mpsz_svy21)+
@@ -473,11 +474,13 @@ tm_shape(condo_resale.res.sf) +
   tm_view(set.zoom.limits = c(11,14))
 
 ```
+
 Remember to switch back to “plot” mode before we continue.
 
 ```{r}
 tmap_mode("plot")
 ```
+
 The figure above reveal that there is sign of spatial autocorrelation.
 
 To proof that our observation is indeed true, the Moran’s I test will be performed
@@ -495,11 +498,13 @@ Next, nb2listw() of spdep packge will be used to convert the output neighbours l
 nb_lw <- nb2listw(nb, style = 'W')
 summary(nb_lw)
 ```
+
 Next, lm.morantest() of spdep package will be used to perform Moran’s I test for residual spatial autocorrelation
 
 ```{r}
 lm.morantest(condo.mlr1, nb_lw)
 ```
+
 The Global Moran’s I test for residual spatial autocorrelation shows that it’s p-value is less than 0.00000000000000022 which is less than the alpha value of 0.05. Hence, we will reject the null hypothesis that the residuals are randomly distributed.
 
 Since the Observed Global Moran I = 0.1424418 which is greater than 0, we can infer than the residuals resemble cluster distribution.
@@ -509,6 +514,7 @@ Since the Observed Global Moran I = 0.1424418 which is greater than 0, we can in
 In this section, you are going to learn how to modelling hedonic pricing using both the fixed and adaptive bandwidth schemes
 
 ## Building Fixed Bandwidth GWR Model
+
 ### Computing fixed bandwith
 
 In the code chunk below bw.gwr() of GWModel package is used to determine the optimal fixed bandwidth to use in the model. Notice that the argument adaptive is set to FALSE indicates that we are interested to compute the fixed bandwidth.
@@ -527,6 +533,7 @@ bw.fixed <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD +
                    adaptive=FALSE, 
                    longlat=FALSE)
 ```
+
 The result shows that the recommended bandwidth is 971.3405 metres. It's in metres because that's the unit of measurement SVY21 is in.
 
 ### GWModel method - fixed bandwith
@@ -544,7 +551,6 @@ gwr.fixed <- gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD +
                        kernel = 'gaussian', 
                        longlat = FALSE)
 ```
-
 
 The output is saved in a list of class “gwrm”. The code below can be used to display the model output.
 
@@ -579,7 +585,7 @@ bw.adaptive <- bw.gwr(formula = SELLING_PRICE ~ AREA_SQM + AGE  +
 
 The result shows that the 30 is the recommended data points to be used.
 
-###  Constructing the adaptive bandwidth gwr model
+### Constructing the adaptive bandwidth gwr model
 
 Now, we can go ahead to calibrate the gwr-based hedonic pricing model by using adaptive bandwidth and gaussian kernel as shown in the code chunk below.
 
@@ -627,10 +633,12 @@ To visualise the fields in SDF, we need to first covert it into sf data.frame by
 condo_resale.sf.adaptive <- st_as_sf(gwr.adaptive$SDF) %>%
   st_transform(crs=3414)
 ```
+
 ```{r}
 condo_resale.sf.adaptive.svy21 <- st_transform(condo_resale.sf.adaptive, 3414)
 condo_resale.sf.adaptive.svy21  
 ```
+
 ```{r}
 gwr.adaptive.output <- as.data.frame(gwr.adaptive$SDF)
 condo_resale.sf.adaptive <- cbind(condo_resale.res.sf, as.matrix(gwr.adaptive.output))
@@ -661,11 +669,11 @@ tm_shape(condo_resale.sf.adaptive) +
   tm_view(set.zoom.limits = c(11,14))
 ```
 
-
 ```{r}
 tmap_mode("plot")
 
 ```
+
 ## Visualising coefficient estimates
 
 The code chunks below is used to create an interactive point symbol map.
@@ -696,6 +704,7 @@ tmap_arrange(AREA_SQM_SE, AREA_SQM_TV,
 ```{r}
 tmap_mode("plot")
 ```
+
 ### By URA Planning Region
 
 ```{r}
@@ -707,7 +716,3 @@ tm_shape(condo_resale.sf.adaptive) +
            border.col = "gray60",
            border.lwd = 1)
 ```
-
-
-
-
