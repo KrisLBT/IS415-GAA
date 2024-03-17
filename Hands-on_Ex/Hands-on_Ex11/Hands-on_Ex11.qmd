@@ -108,6 +108,7 @@ mdata <- read_rds("data/aspatial/mdata.rds")
 The entire data are split into training and test data sets with 65% and 35% respectively by using *initial_split()* of **rsample** package. rsample is one of the package of tigymodels.
 
 ```{r}
+#| eval: False
 set.seed(1234)
 resale_split <- initial_split(mdata, 
                               prop = 6.5/10,)
@@ -116,6 +117,7 @@ test_data <- testing(resale_split)
 ```
 
 ```{r}
+#| eval: False
 write_rds(train_data, "data/model/train_data.rds")
 write_rds(test_data, "data/model/test_data.rds")
 ```
@@ -160,6 +162,7 @@ summary(price_mlr)
 ```
 
 ```{r}
+#| eval: False
 write_rds(price_mlr, "data/model/price_mlr.rds" ) 
 ```
 
@@ -199,4 +202,261 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
 write_rds(bw_adaptive, "data/model/bw_adaptive.rds")
 ```
 
-Prof pls I'm tired I'll finish this later
+## Constructing the adaptive bandwidth gwr model
+
+First, let us call the save bandwidth by using the code chunk below.
+
+```{r}
+bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
+```
+
+Now, we can go ahead to calibrate the gwr-based hedonic pricing model by using adaptive bandwidth and Gaussian kernel as shown in the code chunk below.
+
+
+```{r}
+#| eval: False
+gwr_adaptive <- gwr.basic(formula = resale_price ~
+                            floor_area_sqm + storey_order +
+                            remaining_lease_mths + PROX_CBD + 
+                            PROX_ELDERLYCARE + PROX_HAWKER +
+                            PROX_MRT + PROX_PARK + PROX_MALL + 
+                            PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                            WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                            WITHIN_1KM_PRISCH,
+                          data=train_data_sp,
+                          bw=bw_adaptive, 
+                          kernel = 'gaussian', 
+                          adaptive=TRUE,
+                          longlat = FALSE)
+```
+
+The code chunk below will be used to save the model in rds format for future use.
+
+```{r}
+#| eval: False
+write_rds(gwr_adaptive, "data/model/gwr_adaptive.rds")
+```
+
+## Retrieve gwr output object
+
+The code chunk below will be used to retrieve the save gwr model object.
+
+```{r}
+gwr_adaptive <- read_rds("data/model/gwr_adaptive.rds")
+```
+
+The code below can be used to display the model output.
+
+```{r}
+gwr_adaptive
+```
+## Converting the test data from sf data.frame to SpatialPointDataFrame
+
+```{r}
+test_data_sp <- test_data %>%
+  as_Spatial()
+test_data_sp
+```
+## Computing adaptive bandwidth for the test data
+
+```{r}
+#| eval: False
+gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
+                  storey_order + remaining_lease_mths +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                  data=test_data_sp,
+                  approach="CV",
+                  kernel="gaussian",
+                  adaptive=TRUE,
+                  longlat=FALSE)
+```
+## Computing predicted values of the test data
+
+```{r}
+#| eval: False
+gwr_pred <- gwr.predict(formula = resale_price ~
+                          floor_area_sqm + storey_order +
+                          remaining_lease_mths + PROX_CBD + 
+                          PROX_ELDERLYCARE + PROX_HAWKER + 
+                          PROX_MRT + PROX_PARK + PROX_MALL + 
+                          PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                          WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+                          WITHIN_1KM_PRISCH, 
+                        data=train_data_sp, 
+                        predictdata = test_data_sp, 
+                        bw=40, 
+                        kernel = 'gaussian', 
+                        adaptive=TRUE, 
+                        longlat = FALSE)
+```
+
+Ask prof
+
+# Preparing coordinates data
+## Extracting Coordinate Data
+
+The code chunk below extract the x,y coordinates of the full, training and test data sets.
+
+```{r}
+coords <- st_coordinates(mdata)
+coords_train <- st_coordinates(train_data)
+coords_test <- st_coordinates(test_data)
+```
+
+Before continue, we write all the output into rds for future used.
+
+```{r}
+#| eval: False
+coords_train <- write_rds(coords_train, "data/model/coords_train.rds" )
+coords_test <- write_rds(coords_test, "data/model/coords_test.rds" )
+```
+
+## Dropping geometry field
+
+First, we will drop geometry column of the sf data.frame by using `st_drop_geometry()` of sf package.
+
+```{r}
+train_data <- train_data %>% 
+  st_drop_geometry()
+```
+
+# Calibrating Random Forest Model
+
+In this section, you will learn how to calibrate a model to predict HDB resale price by using random forest function of ranger package.
+
+```{r}
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
+               remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
+               PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + 
+               PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+               WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
+               WITHIN_1KM_PRISCH,
+             data=train_data)
+rf
+```
+```{r}
+#| eval: False
+write_rds(rf, "data/model/rf.rds")
+```
+```{r}
+rf <- read_rds("data/model/rf.rds")
+rf
+```
+
+
+## Calibrating Geographical Random Forest Model
+
+In this section, you will learn how to calibrate a model to predict HDB resale price by using `grf()` of SpatialML package.
+
+### Calibrating using training data
+
+The code chunk below calibrate a geographic ranform forest model by using `grf()` of SpatialML package.
+
+```{r}
+#| eval: False
+set.seed(1234)
+gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + storey_order +
+                       remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE +
+                       PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL +
+                       PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                       WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                       WITHIN_1KM_PRISCH,
+                     dframe=train_data, 
+                     bw=55,
+                     kernel="adaptive",
+                     coords=coords_train)
+```
+
+Let’s save the model output by using the code chunk below.
+
+```{r}
+#| eval: False
+write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
+```
+
+
+The code chunk below can be used to retrieve the save model in future.
+
+```{r}
+#| eval: False
+gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
+```
+
+### Predicting by using test data
+#### Preparing the Test Data
+
+The code chunk below will be used to combine the test data with its corresponding coordinates data.
+
+```{r}
+#| eval: False
+test_data <- cbind(test_data, coords_test) %>%
+  st_drop_geometry()
+```
+
+#### Predicting with test data
+
+Next, `predict.grf()` of spatialML package will be used to predict the resale value by using the test data and gwRF_adaptive model calibrated earlier.
+
+```{r}
+#| eval: False
+gwRF_pred <- predict.grf(gwRF_adaptive, 
+                           test_data, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+Before moving on, let us save the output into rds file for future use.
+
+
+```{r}
+#| eval: False
+GRF_pred <- write_rds(gwRF_pred, "data/model/GRF_pred.rds")
+```
+
+#### Converting the predicting output into a data frame
+
+The output of the `predict.grf()` is a vector of predicted values. It is wiser to convert it into a data frame for further visualisation and analysis.
+
+```{r}
+GRF_pred <- read_rds("data/model/GRF_pred.rds")
+GRF_pred_df <- as.data.frame(GRF_pred)
+```
+
+In the code chunk below, `cbind()` is used to append the predicted values onto test_datathe.
+
+```{r}
+test_data_p <- cbind(test_data, GRF_pred_df)
+```
+
+```{r}
+#| eval: False 
+write_rds(test_data_p, "data/model/test_data_p.rds")
+```
+
+## Calculating Root Mean Square Error
+
+The root mean square error (RMSE) allows us to measure how far predicted values are from observed values in a regression analysis. In the code chunk below, rmse() of Metrics package is used to compute the RMSE.
+
+```{r}
+rmse(test_data_p$resale_price, 
+     test_data_p$GRF_pred)
+```
+
+
+## Visualising the predicted values
+
+Alternatively, scatterplot can be used to visualise the actual resale price and the predicted resale price by using the code chunk below.
+
+```{r}
+ggplot(data = test_data_p,
+       aes(x = GRF_pred,
+           y = resale_price)) +
+  geom_point()
+```
