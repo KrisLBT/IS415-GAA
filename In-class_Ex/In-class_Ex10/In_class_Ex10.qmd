@@ -13,3 +13,235 @@ execute:
 
 date: "`r Sys.Date()`"
 ---
+
+# Load the R Packages
+
+```{r}
+pacman::p_load(sf, spdep, GWmodel, SpatialML, tmap,
+               rsample, tidymodels, tidyverse, gtsummary,
+               rpart, rpart.plot, ggstatplot, performance )
+```
+
+SpatialML --> only for random forest
+rsample --> part of the tidymodel (for random sampling)
+tidymodels --> rsample + other packages (for more modern modelling); framework + family of packages
+
+# Reading Data into Environment
+
+```{r}
+rs_sf <- read_rds("data/rds/HDB_resale.rds")
+```
+
+# Data Sampling
+
+```{r}
+#| eval: False
+set.seed(1234)
+resale_split <- initial_split(rs_sf, 
+                              prop = 5/10,)
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+```
+
+Then, we can write it out to rds for future use.
+
+```{r}
+#| eval: False
+write_rds(train_data, "data/rds/train_data.rds")
+write_rds(test_data, "data/rds/test_data.rds")
+```
+
+```{r}
+train_sf <- read_rds("data/rds/train_data.rds")
+test_sf <- read_rds("data/rds/test_data.rds")
+```
+
+## Create a dataframe
+
+We can use them as a data.frame
+
+```{r}
+train_df <- train_sf %>%
+  st_drop_geometry() %>%
+  as.data.frame()
+
+test_df <- test_sf %>%
+  st_drop_geometry() %>%
+  as.data.frame()
+```
+
+## Correlation Matrix
+
+```{r}
+#| fig-width: 12
+#| fig-height: 12
+rs_sf1 <- rs_sf %>%
+  st_drop_geometry()
+ggstatsplot::ggcorrmat(rs_sf1[, 2:17])
+```
+
+
+```{r}
+tbl_summary(rs_sf1)
+```
+
+Only include factors that are relevant to your case.
+
+```{r}
+train_df <- train_df %>%
+  select(-c(PROX_CHAS))
+train_sf <- train_sf %>%
+  select(-c(PROX_CHAS))
+test_df <- test_df %>%
+  select(-c(PROX_CHAS))
+test_sf <- test_sf %>%
+  select(-c(PROX_CHAS))
+```
+
+```{r}
+rs_mlr <- lm(RESALE_PRICE ~ FLOOR_AREA_SQM +
+                  STOREY_ORDER + REMAINING_LEASE_MTHS +
+                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+                  PROX_MRT + PROX_PARK + PROX_MALL + 
+                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
+                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
+                  WITHIN_1KM_PRISCH,
+                data=train_df)
+summary(rs_mlr)
+```
+
+```{r}
+write_rds(rs_mlr, "data/models/rs_mlr.rds" ) 
+```
+
+### The Training Data
+
+```{r}
+coords <- st_coordinates(rs_sf)
+coords_train <- st_coordinates(train_sf)
+coords_test <- st_coordinates(test_sf)
+```
+
+```{r}
+set.seed(1234)
+rs_rp <- rpart(
+  formula = RESALE_PRICE ~
+    FLOOR_AREA_SQM +
+    STOREY_ORDER +
+    REMAINING_LEASE_MTHS +
+    PROX_CBD +
+    PROX_ELDERLYCARE +
+    PROX_HAWKER +
+    PROX_MRT +
+    PROX_PARK +
+    PROX_GOOD_PRISCH +
+    PROX_MALL +
+    PROX_SUPERMARKET +
+    WITHIN_350M_KINDERGARTEN +
+    WITHIN_350M_CHILDCARE +
+    WITHIN_1KM_PRISCH,
+  data = train_df)
+rs_rp
+  
+
+```
+
+```{R}
+rpart.plot(rs_rp)
+```
+```{r}
+set.seed(1234)
+rs_rf <- ranger(formula = RESALE_PRICE ~
+    FLOOR_AREA_SQM +
+    STOREY_ORDER +
+    REMAINING_LEASE_MTHS +
+    PROX_CBD +
+    PROX_ELDERLYCARE +
+    PROX_HAWKER +
+    PROX_MRT +
+    PROX_PARK +
+    PROX_GOOD_PRISCH +
+    PROX_MALL +
+    PROX_SUPERMARKET +
+    WITHIN_350M_KINDERGARTEN +
+    WITHIN_350M_CHILDCARE +
+    WITHIN_1KM_PRISCH,
+  data = train_df,
+  importance ="impurity")
+
+rs_rf
+```
+
+```{r}
+vi <- as.data.frame(rs_rf$variable.importance)
+vi$variables <- rownames(vi) #takes row name and create new column named variables
+vi <- vi %>%
+  rename(vi = "rs_rf$variable.importance") #rename to something more readable
+```
+
+```{r}
+ggplot(data = vi, 
+       aes( x= vi,
+            y = reorder(variables, vi))) +
+  geom_bar(stat="Identity") # treat every row as a single observation
+```
+If the variable importance are all close to zero with only one important variable, that means that your model has problem and it's because your data DOES NOT allow the model to make use of other variables. This usually happens because of a complete separation/quasi-separation issue (exclude the great predictor first)
+
+To reduce the computational time of bandwidth training, can just set number of neighbors (max/min), nthreads
+
+To make forest managable for shiny,
+-   reduce data size
+-   reduce number of forest
+
+```{r}
+test_df <- cbind(test_sf, coords_test) %>%
+  st_drop_geometry()
+```
+
+```{r}
+grf_pred <- read_rds("data/models/grf_pred.rds")
+grf_pred_df <- as.data.frame(grf_pred)
+```
+
+```{r}
+test_pred <- test_df %>%
+  select(RESALE_PRICE) %>%
+  cbind(grf_pred_df)
+```
+
+```{r}
+rf_pred <- predict(rs_rf, test_df)
+```
+
+```{r}
+rf_pred_df <- as.data.frame(rf_pred$predictions) %>%
+  rename(rf_pred = "rf_pred$predictions")
+```
+
+```{r}
+test_pred <- cbind(test_pred, rf_pred_df)
+```
+
+```{r}
+test_pred <- read_rds("data/models/test_pred.rds")
+```
+
+```{r}
+yardstick::rmse(test_pred, 
+                RESALE_PRICE,
+                rf_pred)
+```
+
+```{r}
+mc <- test_pred %>%
+  pivot_longer(cols=c(2:4),
+               names_to = "models",
+               values_to = "predicted")
+```
+
+```{r}
+ggplot(data = test_pred,
+       aes(x=grf_pred,
+           y=RESALE_PRICE))+
+  geom_point()
+```
