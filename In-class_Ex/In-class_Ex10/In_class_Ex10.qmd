@@ -1,0 +1,15 @@
+---
+title: "In class exercise 10"
+format:
+  html:
+    code-fold: True
+    code-summary: "Show the code"
+    toc: True
+    toc-depth: 4
+execute:
+  eval: True
+  echo: True
+  warning: False
+
+date: "`r Sys.Date()`"
+---
