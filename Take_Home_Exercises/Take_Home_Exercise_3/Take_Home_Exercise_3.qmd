@@ -1,5 +1,5 @@
 ---
-title: "Take Home Exercise 3"
+title: "Take Home Exercise 3: Eldervailability"
 format:
   html:
     code-fold: True
@@ -13,3 +13,122 @@ execute:
 
 date: "`r Sys.Date()`"
 ---
+
+# Overview
+
+I will be building a prototype version of the Shiny app displaying Kernel Density Estimation (KDE) of various facilities related to enabled ageing. These facilities include:
+
+-   Eldercare Services
+-   Community Gardens
+-   Parks
+-   Hospitals
+-   Community Centres (CCs)
+-   CHAS clinics
+
+# Loading the Packages
+
+First, I will be loading the packages
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap, tidyverse)
+```
+
+# Spatial Data Wrangling
+## Non-OSM
+
+Now, I will be importing the data into our R environment. Note that these are not for osm data, which will be handled separately
+
+```{r}
+# Eldercare services
+eldercare_sf <- st_read(dsn= "data/",
+                        layer = "ELDERCARE")
+# Community Gardens
+comGarden_sf <- st_read("data/CommunityinBloomCIB.kml")
+
+# CHAS clinics
+chas_sf<- st_read("data/CHASClinics.kml")
+
+# Coastal OUtline
+mpsz_sf <- st_read(dsn="../../data/data/",
+                   layer = "CostalOutline")
+```
+Now, we will check for their crs.
+
+```{r}
+st_crs(eldercare_sf)
+```
+We will transform this from EPSG9001 to EPSG 3414
+
+```{r}
+eldercare_sf <- eldercare_sf %>%
+  st_transform(3414)
+```
+
+We will repeat this process for the others
+
+```{r}
+st_crs(chas_sf) # is in EPSG9001/WGS84
+
+chas_sf <- chas_sf %>%
+  st_transform(3414)
+
+st_crs(comGarden_sf) # is in WGS84
+
+comGarden_sf <- comGarden_sf %>%
+  st_transform(3414)
+
+st_crs(mpsz_sf) # is in WGS84
+
+mpsz_sf <- mpsz_sf %>%
+  st_transform(3414)
+```
+
+## OSM
+
+We will now handle data (hospital, community centres and parks) from OSM.
+
+According to the documentation, we will have to source the point data from `gis_osm_pois_free_1`. We further filter it to the specific facility type in Singapore
+
+```{r}
+#| eval: False
+pois <- st_read(dsn = "../../data/data/data/",
+                layer = "gis_osm_pois_free_1")
+
+st_crs(pois) # it is in WGS84
+
+pois <- pois %>%
+  st_transform(3414) # make the crs of pois the same as mpsz_sf
+
+pois_sg <- st_intersection(pois, mpsz_sf) # find all the points that intersects with mpsz_sf
+
+hospitals_sf <- pois_sg %>%
+  filter(fclass=="hospital")
+
+comCentres_sf <- pois_sg %>%
+  filter(fclass=="community_centre")
+
+parks_sf <- pois_sg %>%
+  filter(fclass=="park")
+```
+
+We can now write it out for our convenience.
+
+```{r}
+#| eval: False
+st_write(hospitals_sf, "data/hospitals_sf.shp")
+st_write(comCentres_sf, "data/comCentres_sf.shp")
+st_write(parks_sf, "data/parks_sf.shp")
+```
+
+We can now read it into our environment
+ 
+```{r}
+hospitals_sf <- st_read(dsn="data/",
+                        layer = "hospitals_sf")
+comCentres_sf <- st_read(dsn="data/",
+                        layer = "comCentres_sf")
+parks_sf <- st_read(dsn="data/",
+                    layer = "parks_sf")
+```
+
+(TBC)
