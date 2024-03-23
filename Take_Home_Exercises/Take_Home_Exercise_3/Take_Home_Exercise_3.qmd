@@ -51,6 +51,9 @@ chas_sf<- st_read("data/CHASClinics.kml")
 # Coastal OUtline
 mpsz_sf <- st_read(dsn="../../data/data/",
                    layer = "CostalOutline")
+
+sg <- st_read(dsn="../../data/data/",
+              layer= "MP14_SUBZONE_WEB_PL")
 ```
 Now, we will check for their crs.
 
@@ -80,6 +83,11 @@ comGarden_sf <- comGarden_sf %>%
 st_crs(mpsz_sf) # is in WGS84
 
 mpsz_sf <- mpsz_sf %>%
+  st_transform(3414)
+
+st_crs(sg) # it is in WGS84
+
+sg <- sg %>%
   st_transform(3414)
 ```
 
@@ -131,4 +139,404 @@ parks_sf <- st_read(dsn="data/",
                     layer = "parks_sf")
 ```
 
-(TBC)
+# Geospatial Data Wrangling
+## Converting sf data.frames to sp's Spatial* class
+
+The code chunk below uses `as_Spatial()` of *sf* package to convert the three geospatial data from simple feature data frame to sp’s Spatial* class.
+
+```{r}
+chas_sp <- as_Spatial(chas_sf)
+mpsz_sp <- as_Spatial(mpsz_sf)
+comCentres_sp <- as_Spatial(comCentres_sf)
+comGarden_sp <- as_Spatial(comGarden_sf)
+eldercare_sp <- as_Spatial(eldercare_sf)
+hospitals_sp <- as_Spatial(hospitals_sf)
+parks_sp <- as_Spatial(parks_sf)
+sg_sp <- as_Spatial(sg)
+```
+
+## Converting the generic sp format into spatstat’s ppp format
+
+Now, we will use `as.ppp()` function of *spatstat* to convert the spatial data into *spatstat*’s **ppp** object format.
+
+```{r}
+chas_ppp <- as(chas_sp,"ppp")
+comCentres_ppp <- as(comCentres_sp,"ppp")
+comGarden_ppp <- as(comGarden_sp,"ppp")
+eldercare_ppp <- as(eldercare_sp,"ppp")
+hospitals_ppp <- as(hospitals_sp,"ppp")
+parks_ppp <- as(parks_sp,"ppp")
+```
+
+## Check for duplicates
+
+```{r}
+any(duplicated(chas_ppp))
+any(duplicated(comCentres_ppp))
+any(duplicated(comGarden_ppp))
+any(duplicated(eldercare_ppp))
+any(duplicated(parks_ppp))
+any(duplicated(hospitals_ppp))
+```
+Since there are no duplicated points, we can move on.
+
+## Creating owin Object
+
+The code chunk below is used to covert sg SpatialPolygon object into owin object of spatstat.
+
+```{r}
+mpsz_owin <- as(mpsz_sp, "owin")
+```
+
+```{r}
+plot(mpsz_owin)
+```
+
+
+## Combining points events object and owin object
+
+```{r}
+chasSG_ppp = chas_ppp[mpsz_owin]
+comCentresSG_ppp = comCentres_ppp[mpsz_owin]
+comGardenSG_ppp = comGarden_ppp[mpsz_owin]
+eldercareSG_ppp = eldercare_ppp[mpsz_owin]
+hospitalsSG_ppp = hospitals_ppp[mpsz_owin]
+parksSG_ppp = parks_ppp[mpsz_owin]
+```
+
+# First-order Spatial Point Patterns Analysis
+## Kernel Density Estimation
+
+```{r}
+kde_chasSG_bw <- density(chasSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+
+kde_comCentresSG_bw <- density(comCentresSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian")
+
+kde_comGardenSG_bw <- density(comGardenSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+
+kde_eldercareSG_bw <- density(eldercareSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+
+kde_hospitalsSG_bw <- density(hospitalsSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+
+kde_parksSG_bw <- density(parksSG_ppp,
+                              sigma=bw.diggle,
+                              edge=TRUE,
+                            kernel="gaussian") 
+```
+```{r}
+plot(kde_chasSG_bw)
+```
+
+```{r}
+plot(kde_comCentresSG_bw)
+```
+
+
+```{r}
+plot(kde_comGardenSG_bw)
+```
+```{r}
+plot(kde_eldercareSG_bw)
+```
+
+```{r}
+plot(kde_hospitalsSG_bw)
+```
+
+```{r}
+plot(kde_parksSG_bw)
+```
+
+## Rescaling KDE Values
+
+```{r}
+chasSG_ppp.km <- rescale(chasSG_ppp, 1000, "km")
+kde_chasSG.bw <- density(chasSG_ppp.km, sigma = bw.diggle,
+                         edge= TRUE, kernel = "gaussian")
+plot(kde_chasSG.bw)
+```
+
+```{r}
+comCentresSG_ppp.km <- rescale(comCentresSG_ppp, 1000, "km")
+kde_comCentresSG.bw <- density(comCentresSG_ppp.km, sigma = bw.diggle,
+                         edge= TRUE, kernel = "gaussian")
+plot(kde_comCentresSG.bw)
+```
+
+```{r}
+comGardenSG_ppp.km <- rescale(comGardenSG_ppp, 1000, "km")
+kde_comGardenSG.bw <- density(comGardenSG_ppp.km, sigma = bw.diggle,
+                         edge= TRUE, kernel = "gaussian")
+plot(kde_comGardenSG.bw)
+```
+
+```{r}
+eldercareSG_ppp.km <- rescale(eldercareSG_ppp, 1000, "km")
+kde_eldercareSG.bw <- density(eldercareSG_ppp.km, sigma = bw.diggle,
+                         edge= TRUE, kernel = "gaussian")
+plot(kde_eldercareSG.bw)
+
+```
+
+```{r}
+hospitalsSG_ppp.km <- rescale(hospitalsSG_ppp, 1000, "km")
+kde_hospitalsSG.bw <- density(hospitalsSG_ppp.km, sigma = bw.diggle,
+                         edge= TRUE, kernel = "gaussian")
+plot(kde_hospitalsSG.bw)
+```
+
+
+```{r}
+parksSG_ppp.km <- rescale(parksSG_ppp, 1000, "km")
+kde_parksSG.bw <- density(parksSG_ppp.km, sigma = bw.diggle,
+                         edge= TRUE, kernel = "gaussian")
+plot(kde_parksSG.bw)
+```
+# Adaptive KDE
+
+```{r}
+kde_chasSG_adaptive <- adaptive.density(chasSG_ppp.km, method="kernel")
+plot(kde_chasSG_adaptive)
+```
+
+```{r}
+kde_comCentresSG_adaptive <- adaptive.density(comCentresSG_ppp.km, method="kernel")
+plot(kde_comCentresSG_adaptive)
+```
+
+```{r}
+kde_comGardenSG_adaptive <- adaptive.density(comGardenSG_ppp.km, method="kernel")
+plot(kde_comGardenSG_adaptive)
+```
+
+```{r}
+kde_eldercareSG_adaptive <- adaptive.density(eldercareSG_ppp.km, method="kernel")
+plot(kde_eldercareSG_adaptive)
+```
+
+```{r}
+kde_hospitalsSG_adaptive <- adaptive.density(hospitalsSG_ppp.km, method="kernel")
+plot(kde_hospitalsSG_adaptive)
+```
+
+```{r}
+kde_parksSG_adaptive <- adaptive.density(parksSG_ppp.km, method="kernel")
+plot(kde_parksSG_adaptive)
+```
+
+## Converting KDE Output into Grid Object
+
+```{r}
+gridded_kde_chasSG_bw <- as.SpatialGridDataFrame.im(kde_chasSG.bw)
+spplot(gridded_kde_chasSG_bw)
+```
+
+```{r}
+gridded_kde_comCentresSG_bw <- as.SpatialGridDataFrame.im(kde_comCentresSG.bw)
+spplot(gridded_kde_comCentresSG_bw)
+```
+
+```{r}
+gridded_kde_comGardenSG_bw <- as.SpatialGridDataFrame.im(kde_comGardenSG.bw)
+spplot(gridded_kde_comGardenSG_bw)
+```
+```{r}
+gridded_kde_eldercareSG_bw <- as.SpatialGridDataFrame.im(kde_eldercareSG.bw)
+spplot(gridded_kde_eldercareSG_bw)
+```
+```{r}
+gridded_kde_hospitalsSG_bw <- as.SpatialGridDataFrame.im(kde_hospitalsSG.bw)
+spplot(gridded_kde_hospitalsSG_bw)
+```
+```{r}
+gridded_kde_eldercareSG_bw <- as.SpatialGridDataFrame.im(kde_eldercareSG.bw)
+spplot(gridded_kde_eldercareSG_bw)
+```
+
+```{r}
+gridded_kde_hospitalsSG_bw <- as.SpatialGridDataFrame.im(kde_hospitalsSG.bw)
+spplot(gridded_kde_hospitalsSG_bw)
+```
+```{r}
+gridded_kde_parksSG_bw <- as.SpatialGridDataFrame.im(kde_parksSG.bw)
+spplot(gridded_kde_parksSG_bw)
+```
+
+
+# By certain regions
+## Extracting specific regions
+
+```{r}
+pg = sg_sp[sg_sp@data$PLN_AREA_N == "PUNGGOL",]
+tm = sg_sp[sg_sp@data$PLN_AREA_N == "TAMPINES",]
+ck = sg_sp[sg_sp@data$PLN_AREA_N == "CHOA CHU KANG",]
+jw = sg_sp[sg_sp@data$PLN_AREA_N == "JURONG WEST",]
+```
+
+## Create an sp object
+
+```{r}
+pg_sp = as(pg, "SpatialPolygons")
+tm_sp = as(tm, "SpatialPolygons")
+ck_sp = as(ck, "SpatialPolygons")
+jw_sp = as(jw, "SpatialPolygons")
+```
+
+## Create Owin Object
+### Regional owin
+
+```{r}
+pg_owin = as(pg_sp, "owin")
+tm_owin = as(tm_sp, "owin")
+ck_owin = as(ck_sp, "owin")
+jw_owin = as(jw_sp, "owin")
+```
+
+```{r}
+plot(pg_owin)
+```
+
+### CHAS
+
+```{r}
+chas_pg_ppp <- chas_ppp[pg_owin]
+chas_tm_ppp <- chas_ppp[tm_owin]
+chas_ck_ppp <- chas_ppp[ck_owin]
+chas_jw_ppp <- chas_ppp[jw_owin]
+```
+
+
+### Community Centres
+
+```{r}
+comCentres_pg_ppp <- comCentres_ppp[pg_owin]
+comCentres_tm_ppp <- comCentres_ppp[tm_owin]
+comCentres_ck_ppp <- comCentres_ppp[ck_owin]
+comCentres_jw_ppp <- comCentres_ppp[jw_owin]
+```
+
+### Community Gardens
+
+```{r}
+comGarden_pg_ppp <- comGarden_ppp[pg_owin]
+comGarden_tm_ppp <- comGarden_ppp[tm_owin]
+comGarden_ck_ppp <- comGarden_ppp[ck_owin]
+comGarden_jw_ppp <- comGarden_ppp[jw_owin]
+```
+
+### Eldercare
+
+```{r}
+eldercare_pg_ppp <- eldercare_ppp[pg_owin]
+eldercare_tm_ppp <- eldercare_ppp[tm_owin]
+eldercare_ck_ppp <- eldercare_ppp[ck_owin]
+eldercare_jw_ppp <- eldercare_ppp[jw_owin]
+```
+
+### Hospitals
+
+```{r}
+hospitals_pg_ppp <- hospitals_ppp[pg_owin]
+hospitals_tm_ppp <- hospitals_ppp[tm_owin]
+hospitals_ck_ppp <- hospitals_ppp[ck_owin]
+hospitals_jw_ppp <- hospitals_ppp[jw_owin]
+```
+
+### Parks
+
+```{r}
+parks_pg_ppp <- parks_ppp[pg_owin]
+parks_tm_ppp <- parks_ppp[tm_owin]
+parks_ck_ppp <- parks_ppp[ck_owin]
+parks_jw_ppp <- parks_ppp[jw_owin]
+```
+
+## Rescaling owin Object
+
+```{r}
+chas_pg_ppp.km = rescale(chas_pg_ppp, 1000, "km")
+chas_tm_ppp.km = rescale(chas_tm_ppp, 1000, "km")
+chas_ck_ppp.km = rescale(chas_ck_ppp, 1000, "km")
+chas_jw_ppp.km = rescale(chas_jw_ppp, 1000, "km")
+```
+
+```{r}
+comCentres_pg_ppp.km = rescale(comCentres_pg_ppp, 1000, "km")
+comCentres_tm_ppp.km = rescale(comCentres_tm_ppp, 1000, "km")
+comcentres_ck_ppp.km = rescale(comCentres_ck_ppp, 1000, "km")
+comCentres_jw_ppp.km = rescale(comCentres_jw_ppp, 1000, "km")
+```
+
+```{r}
+comGarden_pg_ppp.km = rescale(comGarden_pg_ppp, 1000, "km")
+comGarden_tm_ppp.km = rescale(comGarden_tm_ppp, 1000, "km")
+comGarden_ck_ppp.km = rescale(comGarden_ck_ppp, 1000, "km")
+comGarden_jw_ppp.km = rescale(comGarden_jw_ppp, 1000, "km")
+```
+
+```{r}
+eldercare_pg_ppp.km = rescale(eldercare_pg_ppp, 1000, "km")
+eldercare_tm_ppp.km = rescale(eldercare_tm_ppp, 1000, "km")
+eldercare_ck_ppp.km = rescale(eldercare_ck_ppp, 1000, "km")
+eldercare_jw_ppp.km = rescale(eldercare_jw_ppp, 1000, "km")
+```
+
+```{r}
+hospitals_pg_ppp.km = rescale(hospitals_pg_ppp, 1000, "km")
+hospitals_tm_ppp.km = rescale(hospitals_tm_ppp, 1000, "km")
+hospitals_ck_ppp.km = rescale(hospitals_ck_ppp, 1000, "km")
+hospitals_jw_ppp.km = rescale(hospitals_jw_ppp, 1000, "km")
+```
+
+```{r}
+parks_pg_ppp.km = rescale(parks_pg_ppp, 1000, "km")
+parks_tm_ppp.km = rescale(parks_tm_ppp, 1000, "km")
+parks_ck_ppp.km = rescale(parks_ck_ppp, 1000, "km")
+parks_jw_ppp.km = rescale(parks_jw_ppp, 1000, "km")
+```
+
+## Computing KDE
+
+```{r}
+plot(density(chas_pg_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="CHAS_Punggol")
+plot(density(chas_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="CHAS_Tampines")
+plot(density(chas_ck_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="CHAS_Choa_Chu_Kang")
+plot(density(chas_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="CHAS_Tampines")
+plot(density(chas_jw_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="CHAS_Jurong_West")
+```
+
