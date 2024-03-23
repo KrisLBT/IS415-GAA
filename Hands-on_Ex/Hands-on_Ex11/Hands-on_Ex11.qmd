@@ -212,7 +212,6 @@ bw_adaptive <- read_rds("data/model/bw_adaptive.rds")
 
 Now, we can go ahead to calibrate the gwr-based hedonic pricing model by using adaptive bandwidth and Gaussian kernel as shown in the code chunk below.
 
-
 ```{r}
 #| eval: False
 gwr_adaptive <- gwr.basic(formula = resale_price ~
@@ -250,6 +249,7 @@ The code below can be used to display the model output.
 ```{r}
 gwr_adaptive
 ```
+
 ## Converting the test data from sf data.frame to SpatialPointDataFrame
 
 ```{r}
@@ -257,6 +257,7 @@ test_data_sp <- test_data %>%
   as_Spatial()
 test_data_sp
 ```
+
 ## Computing adaptive bandwidth for the test data
 
 ```{r}
@@ -274,6 +275,7 @@ gwr_bw_test_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
                   adaptive=TRUE,
                   longlat=FALSE)
 ```
+
 ## Computing predicted values of the test data
 
 ```{r}
@@ -297,6 +299,7 @@ gwr_pred <- gwr.predict(formula = resale_price ~
 Ask prof
 
 # Preparing coordinates data
+
 ## Extracting Coordinate Data
 
 The code chunk below extract the x,y coordinates of the full, training and test data sets.
@@ -339,15 +342,16 @@ rf <- ranger(resale_price ~ floor_area_sqm + storey_order +
              data=train_data)
 rf
 ```
+
 ```{r}
 #| eval: False
 write_rds(rf, "data/model/rf.rds")
 ```
+
 ```{r}
 rf <- read_rds("data/model/rf.rds")
 rf
 ```
-
 
 ## Calibrating Geographical Random Forest Model
 
@@ -379,7 +383,6 @@ Let’s save the model output by using the code chunk below.
 write_rds(gwRF_adaptive, "data/model/gwRF_adaptive.rds")
 ```
 
-
 The code chunk below can be used to retrieve the save model in future.
 
 ```{r}
@@ -388,6 +391,7 @@ gwRF_adaptive <- read_rds("data/model/gwRF_adaptive.rds")
 ```
 
 ### Predicting by using test data
+
 #### Preparing the Test Data
 
 The code chunk below will be used to combine the test data with its corresponding coordinates data.
@@ -413,7 +417,6 @@ gwRF_pred <- predict.grf(gwRF_adaptive,
 ```
 
 Before moving on, let us save the output into rds file for future use.
-
 
 ```{r}
 #| eval: False
@@ -448,7 +451,6 @@ The root mean square error (RMSE) allows us to measure how far predicted values 
 rmse(test_data_p$resale_price, 
      test_data_p$GRF_pred)
 ```
-
 
 ## Visualising the predicted values
 
