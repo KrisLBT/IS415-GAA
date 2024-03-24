@@ -540,3 +540,157 @@ plot(density(chas_jw_ppp,
              main="CHAS_Jurong_West")
 ```
 
+```{r}
+plot(density(comCentres_pg_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comCentres_Punggol")
+plot(density(comCentres_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comCentres_Tampines")
+##plot(density(comCentres_ck_ppp,  # this one doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="comCentres_Choa_Chu_Kang")
+
+plot(density(comCentres_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comCentres_Tampines")
+#plot(density(comCentres_jw_ppp,  # this one also doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="comCentres_Jurong_West")
+```
+
+```{r}
+plot(density(comGarden_pg_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comGarden_Punggol")
+plot(density(comGarden_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comGarden_Tampines")
+plot(density(comGarden_ck_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comGarden_Choa_Chu_Kang")
+plot(density(chas_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comGarden_Tampines")
+plot(density(comGarden_jw_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="comGarden_Jurong_West")
+```
+
+```{r}
+plot(density(eldercare_pg_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="eldercare_Punggol")
+plot(density(eldercare_tm_ppp, #
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="eldercare_Tampines")
+plot(density(eldercare_ck_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="eldercare_Choa_Chu_Kang")
+plot(density(eldercare_tm_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="eldercare_Tampines")
+plot(density(eldercare_jw_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="eldercare_Jurong_West")
+```
+
+```{r}
+plot(density(hospitals_pg_ppp,
+             sigma=bw.ppl,
+             edge=TRUE,
+             kernel="gaussian"),
+             main="hospitals_Punggol")
+#plot(density(hospitals_tm_ppp, # this one doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="hospitals_Tampines")
+
+#plot(density(hospitals_ck_ppp, # this one doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="hospitals_Choa_Chu_Kang")
+#plot(density(hospitals_tm_ppp, # this one doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="hospitals_Tampines")
+
+#plot(density(hospitals_jw_ppp,   # this one doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="hospitals_Jurong_West")
+```
+
+
+```{r}
+#plot(density(parkss_pg_ppp,   # this doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="parks_Punggol")
+#plot(density(parks_tm_ppp,  # this one doesn't work
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="parks_Tampines")
+#plot(density(parks_ck_ppp,
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="parks_Choa_Chu_Kang")
+
+#plot(density(parks_tm_ppp,
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="parks_Tampines")
+#plot(density(parks_jw_ppp,
+#             sigma=bw.ppl,
+#             edge=TRUE,
+#             kernel="gaussian"),
+#             main="parks_Jurong_West")
+```
+I suspect you can't actually use KDE for a subzone if there are 0 values
+
+
+
+
+
+
+
+
+
