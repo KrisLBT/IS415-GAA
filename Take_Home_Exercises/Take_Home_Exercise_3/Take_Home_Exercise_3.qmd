@@ -657,7 +657,7 @@ plot(density(hospitals_pg_ppp,
 
 
 ```{r}
-#plot(density(parkss_pg_ppp,   # this doesn't work
+#plot(density(parks_pg_ppp,   # this doesn't work
 #             sigma=bw.ppl,
 #             edge=TRUE,
 #             kernel="gaussian"),

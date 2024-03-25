@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Exercise 12: Modelling Geographical Accessibility"
+title: "In-class Exercise 11: Modelling Geographical Accessibility"
 format:
   html:
     code-fold: True
@@ -107,13 +107,13 @@ ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", skip = 0)
 
 ## Tidying Distance Matrix
 
-The code chunk below uses `spread()` of tidyr package is used to transform the O-D matrix from a thin format into a fat format.
+The code chunk below uses `pivot_wider()` of tidyr package is used to transform the O-D matrix from a thin format into a fat format.
 
 ```{r}
 distmat <- ODMatrix %>%
   select(origin_id, destination_id, total_cost) %>%
-  spread(destination_id, total_cost)%>%
-  select(c(-c('origin_id')))
+  pivot_wider(names_from= destination_id, values_from =total_cost)%>%
+  select(-origin_id)
 ```
 
 ::: callout-note

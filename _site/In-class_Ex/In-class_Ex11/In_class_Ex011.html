@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2024-03-25">
 
-<title>IS415-GAA - Hands-on Exercise 12: Modelling Geographical Accessibility</title>
+<title>IS415-GAA - In-class Exercise 11: Modelling Geographical Accessibility</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -232,7 +232,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
  <span class="dropdown-text">In-class Exercise 10</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex11/In_class_Ex11.html">
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex11/In_class_Ex011.html">
  <span class="dropdown-text">In-class Exercise 11</span></a>
   </li>  
     </ul>
@@ -323,7 +323,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Hands-on Exercise 12: Modelling Geographical Accessibility</h1>
+<h1 class="title">In-class Exercise 11: Modelling Geographical Accessibility</h1>
 </div>
 
 
@@ -519,14 +519,14 @@ PROJCRS["SVY21 / Singapore TM",
 </section>
 <section id="tidying-distance-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="tidying-distance-matrix">Tidying Distance Matrix</h2>
-<p>The code chunk below uses <code>spread()</code> of tidyr package is used to transform the O-D matrix from a thin format into a fat format.</p>
+<p>The code chunk below uses <code>pivot_wider()</code> of tidyr package is used to transform the O-D matrix from a thin format into a fat format.</p>
 <div class="cell">
 <details>
 <summary>Show the code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>distmat <span class="ot">&lt;-</span> ODMatrix <span class="sc">%&gt;%</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(origin_id, destination_id, total_cost) <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(destination_id, total_cost)<span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fu">c</span>(<span class="st">'origin_id'</span>)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from=</span> destination_id, <span class="at">values_from =</span>total_cost)<span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>origin_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <div class="callout-note callout callout-style-default callout-captioned">
