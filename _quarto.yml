@@ -53,6 +53,8 @@ website:
             href: "In-class_Ex/In-class_Ex09/In_class_Ex09.html"
           - text: "In-class Exercise 10"
             href: "In-class_Ex/In-class_Ex10/In_class_Ex10.html"
+          - text: "In-class Exercise 11"
+            href: "In-class_Ex/In-class_Ex11/In_class_Ex11.html"
       - text: "Take Home Exercises"
         menu:
           - text: "Take_Home_Exercise 01 Part 1"
