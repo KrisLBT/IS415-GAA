@@ -44,9 +44,21 @@ All the values of the cost related fields are in **metres**.
 The code chunk below installs and launches these R packages into RStudio environment.
 
 ```{r}
-pacman::p_load(tmap, SpatialAcc, sf, 
-               ggstatsplot, reshape2,
-               tidyverse)
+#| eval: False
+
+detach("package:spflow", unload = TRUE)
+devtools::install_github("LukeCe/spflow") # to get latest version
+
+```
+
+```{r}
+pacman::p_load(tmap, sf, spdep, sp, Matrix, spflow, reshape2, knitr, tidyverse)
+```
+
+```{r}
+mpsz_nb <- read_rds("data/rds/mpsz_nb.rds")
+mpsz_flow <- read_rds("data/rds/mpsz_flow.rds")
+mpsz_var <- read_rds("data/rds/mpsz_var.rds")
 ```
 
 # Geospatial Data Wrangling
@@ -133,7 +145,7 @@ distmat_km <- as.matrix(distmat/1000)
 The code chunk below calculates Hansen’s accessibility using `ac()` of *SpatialAcc* and `data.frame()` is used to save the output in a data frame called **acc_Handsen**.
 
 ```{r}
-acc_Hansen <- data.frame(ac(hexagons$demand,
+acc_Hansen <- data.frame(SpatialAcc::ac(hexagons$demand,
                             eldercare$capacity,
                             distmat_km, 
                             #d0 = 50,
@@ -162,7 +174,7 @@ hexagon_Hansen <- bind_cols(hexagons, acc_Hansen)
 Actually, the steps above can be perform by using a single code chunk as shown below.
 
 ```{r}
-acc_Hansen <- data.frame(ac(hexagons$demand,
+acc_Hansen <- data.frame(SpatialAcc::ac(hexagons$demand,
                             eldercare$capacity,
                             distmat_km, 
                             #d0 = 50,
@@ -242,7 +254,7 @@ ggplot(data=hexagon_Hansen,
 In this section, you are going to repeat most of the steps you had learned in previous section to perform the analysis. However, some of the codes will be combined into one code chunk. The code chunk below calculates Hansen’s accessibility using `ac()` of SpatialAcc and `data.frame()` is used to save the output in a data frame called acc_KD2SFCA. Notice that KD2SFCA is used for family argument.
 
 ```{r}
-acc_KD2SFCA <- data.frame(ac(hexagons$demand,
+acc_KD2SFCA <- data.frame(SpatialAcc::ac(hexagons$demand,
                             eldercare$capacity,
                             distmat_km, 
                             d0 = 50,
@@ -316,7 +328,7 @@ In this section, you are going to repeat most of the steps you had learned in pr
 The code chunk below calculates Hansen’s accessibility using ac() of SpatialAcc and data.frame() is used to save the output in a data frame called acc_SAM. Notice that SAM is used for family argument.
 
 ```{r}
-acc_SAM <- data.frame(ac(hexagons$demand,
+acc_SAM <- data.frame(SpatialAcc::ac(hexagons$demand,
                          eldercare$capacity,
                          distmat_km, 
                          d0 = 50,
@@ -379,4 +391,23 @@ ggplot(data=hexagon_SAM,
              fun.y="mean", 
              colour ="red", 
              size=2)
+```
+
+# Lecture
+
+```{r}
+mpsz_net <- spflow_network(
+  id_net = "sg",
+  node_neighborhood = nb2mat(mpsz_nb$by_contiguity),
+  node_data = mpsz_var,
+  node_key_column = "SZ_CODE"
+)
+
+mpsz_net
+```
+
+```{r}
+#| eval: False
+mpsz_multi_net <- spflow_network_multi(mpsz_net,
+                                       mpsz_net_pairs)
 ```
